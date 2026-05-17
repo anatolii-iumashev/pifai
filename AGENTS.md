@@ -1,6 +1,6 @@
-# AGENTS.md — pl-chat Knowledge Base
+# AGENTS.md — ПиФ (Психология и Философия) Knowledge Base
 
-LLM Wiki schema для базы знаний чат-бота Психолог (ННО Маршала Розенберга + Карл Юнг).
+LLM Wiki schema для базы знаний чат-бота ПиФ (ННО Маршала Розенберга + Карл Юнг).
 
 Key RFC ([docs/rfc/260517-kb-pl-chat.md](./docs/rfc/260517-kb-pl-chat.md))
 

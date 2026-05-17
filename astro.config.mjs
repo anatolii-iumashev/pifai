@@ -21,8 +21,8 @@ export default defineConfig({
 
   integrations: [
     starlight({
-      title: "База знаний по психологии",
-      description: "База знаний по психологии и чат бот психотерапевт.",
+      title: "ПиФ — Бот + БЗ",
+      description: "База знаний по психологии и философии. Чат-бот психотерапевт.",
       sidebar: [
         {
           label: "1. База и вводные",
