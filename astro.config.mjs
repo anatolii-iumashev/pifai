@@ -25,59 +25,75 @@ export default defineConfig({
       description: "База знаний по психологии и чат бот психотерапевт.",
       sidebar: [
         {
-          label: "MBTI — Типология",
-          collapsed: true,
-          items: [{ autogenerate: { directory: "mbti" } }],
-        },
-        {
-          label: "Ненасильственное общение (ННО)",
+          label: "1. База и вводные",
           collapsed: false,
-          items: [{ autogenerate: { directory: "nvc" } }],
+          items: [{ autogenerate: { directory: "basics" } }],
         },
         {
-          label: "Юнгианская психология",
+          label: "2. Проблематика и Use cases",
           collapsed: true,
-          items: [{ autogenerate: { directory: "jung" } }],
+          items: [{ autogenerate: { directory: "use-cases" } }],
         },
         {
-          label: "Логотерапия Франкла",
+          label: "3. Практики и техники",
           collapsed: true,
-          items: [{ autogenerate: { directory: "frankl" } }],
+          items: [{ autogenerate: { directory: "practices" } }],
         },
         {
-          label: "Интегральная теория Уилбера",
+          label: "4. Цитаты великих людей",
           collapsed: true,
-          items: [{ autogenerate: { directory: "wilber" } }],
+          items: [{ autogenerate: { directory: "quotes" } }],
         },
         {
-          label: "Процессуальная психология Минделла",
+          label: "5. Авторы и школы",
           collapsed: true,
-          items: [{ autogenerate: { directory: "mindell" } }],
+          items: [
+            {
+              label: "ННО — Маршалл Розенберг",
+              collapsed: true,
+              items: [{ autogenerate: { directory: "authors/nvc" } }],
+            },
+            {
+              label: "Юнгианская психология",
+              collapsed: true,
+              items: [{ autogenerate: { directory: "authors/jung" } }],
+            },
+            {
+              label: "Логотерапия Франкла",
+              collapsed: true,
+              items: [{ autogenerate: { directory: "authors/frankl" } }],
+            },
+            {
+              label: "Интегральная теория Уилбера",
+              collapsed: true,
+              items: [{ autogenerate: { directory: "authors/wilber" } }],
+            },
+            {
+              label: "Процессуальная психология Минделла",
+              collapsed: true,
+              items: [{ autogenerate: { directory: "authors/mindell" } }],
+            },
+            {
+              label: "Методология Адизеса",
+              collapsed: true,
+              items: [{ autogenerate: { directory: "authors/adizes" } }],
+            },
+            {
+              label: "Психологическое айкидо Литвака",
+              collapsed: true,
+              items: [{ autogenerate: { directory: "authors/litvak" } }],
+            },
+          ],
         },
         {
-          label: "Методология Адизеса",
+          label: "6. Классификация и типология",
           collapsed: true,
-          items: [{ autogenerate: { directory: "adizes" } }],
+          items: [{ autogenerate: { directory: "typology" } }],
         },
         {
-          label: "Психологическое айкидо Литвака",
+          label: "7. Дополнения",
           collapsed: true,
-          items: [{ autogenerate: { directory: "litvak" } }],
-        },
-        {
-          label: "Интеграция подходов",
-          collapsed: true,
-          items: [{ autogenerate: { directory: "integral" } }],
-        },
-        {
-          label: "Техники и упражнения",
-          collapsed: true,
-          items: [{ autogenerate: { directory: "techniques" } }],
-        },
-        {
-          label: "FAQ",
-          collapsed: true,
-          items: [{ autogenerate: { directory: "faq" } }],
+          items: [{ autogenerate: { directory: "addons" } }],
         },
       ],
 
