@@ -25,34 +25,34 @@ export default defineConfig({
       description: "Психологический чат-бот на основе ННО Маршала Розенберга и Юнгианской психологии.",
       sidebar: [
         {
-          label: "ННО (Ненасильственное общение)",
+          label: "Ненасильственное общение (ННО)",
           collapsed: false,
-          autogenerate: { directory: "nvc" },
+          items: [{ autogenerate: { directory: "nvc" } }],
         },
         {
           label: "Юнгианская психология",
           collapsed: true,
-          autogenerate: { directory: "jung" },
+          items: [{ autogenerate: { directory: "jung" } }],
         },
         {
           label: "Психология",
           collapsed: true,
-          autogenerate: { directory: "psychology" },
+          items: [{ autogenerate: { directory: "psychology" } }],
         },
         {
           label: "Техники и упражнения",
           collapsed: true,
-          autogenerate: { directory: "techniques" },
+          items: [{ autogenerate: { directory: "techniques" } }],
         },
         {
           label: "Руководства",
           collapsed: true,
-          autogenerate: { directory: "how-to" },
+          items: [{ autogenerate: { directory: "how-to" } }],
         },
         {
           label: "FAQ",
           collapsed: true,
-          autogenerate: { directory: "faq" },
+          items: [{ autogenerate: { directory: "faq" } }],
         },
       ],
 
