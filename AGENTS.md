@@ -15,18 +15,24 @@ pl-chat/
 │       └── MMDD/              # Month + Day (e.g. 0501 = May 1)
 │           └── file.{md,pdf}  # Source files
 ├── src/content/docs/          # ★ WIKI PAGES — you write and maintain these
-│   ├── nvc/                   # Nonviolent Communication / ННО (Розенберг)
-│   ├── jung/                  # Carl Jung / Юнгианская психология
-│   ├── mbti/                  # MBTI — 8 когнитивных функций, 16 типов
-│   ├── frankl/                # Логотерапия Виктора Франкла
-│   ├── wilber/                # Интегральная теория Кена Уилбера (AQAL)
-│   ├── mindell/               # Процессуальная психология Арнольда Минделла
-│   ├── adizes/                # Методология Ицхака Адизеса (PAEI)
-│   ├── litvak/                # Психологическое айкидо Михаила Литвака
-│   ├── integral/              # Интеграция всех подходов
-│   ├── techniques/            # Техники и упражнения
-│   ├── faq/                   # FAQ и сравнения
-│   ├── queries/               # Filed answers from user queries
+│   ├── basics/                # 1. База и вводные — с чего начать
+│   ├── use-cases/             # 2. Проблематика и Use cases
+│   ├── practices/             # 3. Практики и техники
+│   ├── quotes/                # 4. Цитаты великих людей
+│   ├── authors/               # 5. Авторы и школы
+│   │   ├── nvc/               #   ННО / Nonviolent Communication (Розенберг)
+│   │   ├── jung/              #   Юнгианская психология (Карл Юнг)
+│   │   ├── frankl/            #   Логотерапия (Виктор Франкл)
+│   │   ├── wilber/            #   Интегральная теория (Кен Уилбер)
+│   │   ├── mindell/           #   Процессуальная психология (Арнольд Минделл)
+│   │   ├── adizes/            #   Методология Адизеса (PAEI)
+│   │   └── litvak/            #   Психологическое айкидо (Михаил Литвак)
+│   ├── typology/              # 6. Классификация и типология
+│   │   └── mbti/              #   MBTI — 8 когнитивных функций, 16 типов
+│   ├── addons/                # 7. Дополнения
+│   │   ├── integral/          #   Интеграция всех подходов
+│   │   ├── faq/               #   FAQ и сравнения
+│   │   └── queries/           #   Filed answers from user queries
 │   ├── index.md               # Catalog of all pages (update on every ingest)
 │   └── log.md                 # Chronological operations log (append on every operation)
 ├── AGENTS.md                  # This file — wiki schema
@@ -96,17 +102,21 @@ When asked to ingest a source:
    - What to emphasize/de-emphasize
    - Potential contradictions with existing pages
 4. **Create/update pages** in the appropriate `src/content/docs/` subdirectory:
-   - ННО / NVC concepts → `nvc/`
-   - Юнгианская психология → `jung/`
-   - MBTI / Типология → `mbti/`
-   - Логотерапия Франкла → `frankl/`
-   - Интегральная теория Уилбера → `wilber/`
-   - Процессуальная психология Минделла → `mindell/`
-   - Методология Адизеса → `adizes/`
-   - Психологическое айкидо Литвака → `litvak/`
-   - Интеграция подходов → `integral/`
-   - Практические техники → `techniques/`
-   - FAQ/comparisons → `faq/`
+   - Базовая теория, вводные → `basics/`
+   - Проблемы, запросы, use cases → `use-cases/`
+   - Техники и упражнения → `practices/`
+   - Вдохновляющие цитаты → `quotes/`
+   - ННО / NVC concepts → `authors/nvc/`
+   - Юнгианская психология → `authors/jung/`
+   - Логотерапия Франкла → `authors/frankl/`
+   - Интегральная теория Уилбера → `authors/wilber/`
+   - Процессуальная психология Минделла → `authors/mindell/`
+   - Методология Адизеса → `authors/adizes/`
+   - Психологическое айкидо Литвака → `authors/litvak/`
+   - MBTI / Типология → `typology/` / `typology/mbti/`
+   - Интеграция подходов → `addons/integral/`
+   - FAQ/comparisons → `addons/faq/`
+   - Сохранённые ответы → `addons/queries/`
    - If a new category is needed → propose it to the user
    - **Every page must include «Материалы и источники»** at the bottom
 5. **Update `src/content/docs/index.md`** — add entry with relative link + one-line summary

@@ -17,18 +17,24 @@ pl-chat/
 ├── raw/                       # Immutable источники
 │   └── YYYY/MMDD/             # Дата-организованные файлы
 ├── src/content/docs/          # Wiki-страницы
-│   ├── nvc/                   # Ненасильственное общение (Розенберг)
-│   ├── jung/                  # Юнгианская психология
-│   ├── mbti/                  # MBTI — 8 функций, 16 типов
-│   ├── frankl/                # Логотерапия (Франкл)
-│   ├── wilber/                # Интегральная теория (Уилбер)
-│   ├── mindell/               # Процессуальная психология (Минделл)
-│   ├── adizes/                # Методология Адизеса — PAEI, лидерство
-│   ├── litvak/                # Психологическое айкидо (Литвак)
-│   ├── integral/              # Интеграция всех подходов
-│   ├── techniques/            # Техники и упражнения
-│   ├── faq/                   # FAQ
-│   ├── queries/               # Сохранённые ответы
+│   ├── basics/                # 1. База и вводные — с чего начать
+│   ├── use-cases/              # 2. Проблематика и Use cases
+│   ├── practices/             # 3. Практики и техники
+│   ├── quotes/                # 4. Цитаты великих людей
+│   ├── authors/               # 5. Авторы и школы
+│   │   ├── nvc/               #   ННО (Розенберг)
+│   │   ├── jung/              #   Юнгианская психология
+│   │   ├── frankl/            #   Логотерапия (Франкл)
+│   │   ├── wilber/            #   Интегральная теория (Уилбер)
+│   │   ├── mindell/           #   Процессуальная психология (Минделл)
+│   │   ├── adizes/            #   Методология Адизеса
+│   │   └── litvak/            #   Психологическое айкидо (Литвак)
+│   ├── typology/              # 6. Классификация и типология
+│   │   └── mbti/              #   MBTI
+│   ├── addons/                  # 7. Дополнения
+│   │   ├── integral/          #   Интеграция подходов
+│   │   ├── faq/               #   FAQ
+│   │   └── queries/           #   Сохранённые ответы
 │   ├── index.md               # Каталог
 │   └── log.md                 # Журнал операций
 ├── .agents/skills/            # Скиллы для работы с вики (в проекте!)
@@ -38,31 +44,48 @@ pl-chat/
 
 ### Оглавление
 
-- **[ННО (Ненасильственное общение)](src/content/docs/nvc/index.md)** — 4 компонента ННО, принципы, применение
-  - [4 компонента ННО](src/content/docs/nvc/4-components.md) — детальный разбор с примерами
-- **[Юнгианская психология](src/content/docs/jung/index.md)** — архетипы, коллективное бессознательное, индивидуация
-  - [Архетипы и коллективное бессознательное](src/content/docs/jung/archetypes.md) — универсальные паттерны психики
-  - [Тень](src/content/docs/jung/shadow.md) — архетип вытесненных качеств, проекции
-- **[MBTI — Типология Майерс-Бриггс](src/content/docs/mbti/index.md)** — 8 когнитивных функций, 16 типов личности
-- **[Логотерапия Виктора Франкла](src/content/docs/frankl/index.md)** — поиск смысла, экзистенциальный вакуум
-  - [Три источника смысла](src/content/docs/frankl/three-sources-of-meaning.md) — ценности творчества, переживания, установки
-  - [Парадоксальная интенция](src/content/docs/frankl/paradoxical-intention.md) — метод работы с фобиями
-- **[Интегральная теория Кена Уилбера](src/content/docs/wilber/index.md)** — AQAL-модель, уровни, линии
-  - [AQAL-модель: четыре квадранта](src/content/docs/wilber/aqal-four-quadrants.md) — I/It/We/Its, Spiral Dynamics
-- **[Процессуальная психология Арнольда Минделла](src/content/docs/mindell/index.md)** — dreambody, глубинная демократия
-  - [Dreambody: тело сновидения](src/content/docs/mindell/dreambody.md) — единство симптомов и сновидений
-- **[Методология Ицхака Адизеса](src/content/docs/adizes/index.md)** — PAEI-роли, жизненный цикл, лидерство
-  - [PAEI-роли по Адизесу](src/content/docs/adizes/paei-roles.md) — четыре роли и миф об идеальном менеджере
-- **[Психологическое айкидо Михаила Литвака](src/content/docs/litvak/index.md)** — амортизация, конфликты
-  - [Метод амортизации](src/content/docs/litvak/amortization.md) — виды амортизации, формула ДА—ЧУВСТВА—ВОПРОС
-- **[Интеграция подходов](src/content/docs/integral/index.md)** — синтез всех подходов
-- **[Техники и упражнения](src/content/docs/techniques/index.md)** — практические техники
-  - [Техника ННО: 4 шага](src/content/docs/techniques/nvc-4-steps.md) — пошаговое применение
-  - [Работа с Тенью](src/content/docs/techniques/shadow-work.md) — дневник, активное воображение
-  - [Техника парадоксальной интенции](src/content/docs/techniques/paradoxical-intention-exercise.md) — метод при фобиях
-  - [Техника амортизации в конфликте](src/content/docs/techniques/amortization-exercise.md) — формула и сценарии
-- **[FAQ](src/content/docs/faq/index.md)** — часто задаваемые вопросы
-- **[Queries](src/content/docs/queries/index.md)** — сохранённые ответы
+- **[1. База и вводные](src/content/docs/basics/index.md)** — с чего начать, базовая психологическая грамотность
+  - [Что такое психика](src/content/docs/basics/what-is-psyche.md) — сознание, бессознательное и модель Фрейда
+  - [Эмоции и потребности](src/content/docs/basics/emotions-and-needs.md) — эмоциональная грамотность и 6 групп потребностей
+- **[2. Проблематика и Use cases](src/content/docs/use-cases/index.md)** — типовые запросы: тревога, депрессия, кризисы, отношения
+  - [Тревога, страхи, фобии](src/content/docs/use-cases/anxiety-fears.md) — виды расстройств, КПТ, экспозиция
+  - [Депрессия, апатия, выгорание](src/content/docs/use-cases/depression-burnout.md) — как различить и что делать
+- **[3. Практики и техники](src/content/docs/practices/index.md)** — рабочие инструменты
+  - [Техника ННО: 4 шага](src/content/docs/practices/nvc-4-steps.md)
+  - [Работа с Тенью](src/content/docs/practices/shadow-work.md)
+  - [Техника парадоксальной интенции](src/content/docs/practices/paradoxical-intention-exercise.md)
+  - [Техника амортизации в конфликте](src/content/docs/practices/amortization-exercise.md)
+  - [Дневник эмоций и потребностей](src/content/docs/practices/emotional-diary.md)
+  - [Техника заземления 5-4-3-2-1](src/content/docs/practices/grounding-5-4-3-2-1.md)
+- **[4. Цитаты великих людей](src/content/docs/quotes/index.md)** — вдохновение и мотивация
+  - [Лев Толстой](src/content/docs/quotes/tolstoy.md) — из «Круга Чтения» и «Пути Жизни»
+  - [Карл Юнг](src/content/docs/quotes/jung.md) — о самопознании и Тени
+  - [Виктор Франкл](src/content/docs/quotes/frankl.md) — о смысле и страдании
+  - [Маршалл Розенберг](src/content/docs/quotes/rosenberg.md) — об эмпатии и потребностях
+  - [Другие мыслители](src/content/docs/quotes/others.md) — Фрейд, Эпиктет, Марк Аврелий, Будда и др.
+- **[5. Авторы и школы](src/content/docs/authors/index.md)** — ключевые идеи авторов и подходов
+  - [ННО — Розенберг](src/content/docs/authors/nvc/index.md)
+    - [4 компонента ННО](src/content/docs/authors/nvc/4-components.md)
+  - [Юнг](src/content/docs/authors/jung/index.md)
+    - [Архетипы](src/content/docs/authors/jung/archetypes.md)
+    - [Тень](src/content/docs/authors/jung/shadow.md)
+  - [Франкл](src/content/docs/authors/frankl/index.md)
+    - [Три источника смысла](src/content/docs/authors/frankl/three-sources-of-meaning.md)
+    - [Парадоксальная интенция](src/content/docs/authors/frankl/paradoxical-intention.md)
+  - [Уилбер](src/content/docs/authors/wilber/index.md)
+    - [AQAL-модель](src/content/docs/authors/wilber/aqal-four-quadrants.md)
+  - [Минделл](src/content/docs/authors/mindell/index.md)
+    - [Dreambody](src/content/docs/authors/mindell/dreambody.md)
+  - [Адизес](src/content/docs/authors/adizes/index.md)
+    - [PAEI-роли](src/content/docs/authors/adizes/paei-roles.md)
+  - [Литвак](src/content/docs/authors/litvak/index.md)
+    - [Метод амортизации](src/content/docs/authors/litvak/amortization.md)
+- **[6. Классификация и типология](src/content/docs/typology/index.md)** — справочник моделей и аббревиатур
+  - [MBTI](src/content/docs/typology/mbti/index.md) — 4 дихотомии, 8 функций, 16 типов
+- **[7. Дополнения](src/content/docs/addons/index.md)** — служебные и мета-материалы
+  - [Интеграция подходов](src/content/docs/addons/integral/index.md)
+  - [FAQ](src/content/docs/addons/faq/index.md)
+  - [Queries](src/content/docs/addons/queries/index.md)
 
 ---
 

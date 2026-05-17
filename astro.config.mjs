@@ -6,9 +6,9 @@ const isGitHubPagesBuild = process.env.GITHUB_ACTIONS === "true";
 
 const SITE_URL = process.env.CNAME
   ? `https://${process.env.CNAME}`
-  : "https://aa.github.io/pl-chat";
+  : "https://anatolii-iumashev.github.io/pl-chat";
 
-// Use /pl-chat only for GitHub Pages CI builds; keep local dev/preview on root.
+  // Use /pl-chat only for GitHub Pages CI builds; keep local dev/preview on root.
 const BASE = process.env.CNAME ? "/" : (isGitHubPagesBuild ? "/pl-chat" : "/");
 
 export default defineConfig({
@@ -21,8 +21,8 @@ export default defineConfig({
 
   integrations: [
     starlight({
-      title: "База знаний pl-chat",
-      description: "Психологический чат-бот: ННО, юнгианство, логотерапия, MBTI, интегральный подход и практические техники.",
+      title: "База знаний по психологии",
+      description: "База знаний по психологии и чат бот психотерапевт.",
       sidebar: [
         {
           label: "MBTI — Типология",
