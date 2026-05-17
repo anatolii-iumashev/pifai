@@ -17,9 +17,15 @@ pl-chat/
 ├── raw/                       # Immutable источники
 │   └── YYYY/MMDD/             # Дата-организованные файлы
 ├── src/content/docs/          # Wiki-страницы
-│   ├── nvc/                   # Ненасильственное общение
+│   ├── nvc/                   # Ненасильственное общение (Розенберг)
 │   ├── jung/                  # Юнгианская психология
-│   ├── psychology/            # Общая психология
+│   ├── mbti/                  # MBTI — 8 функций, 16 типов
+│   ├── frankl/                # Логотерапия (Франкл)
+│   ├── wilber/                # Интегральная теория (Уилбер)
+│   ├── mindell/               # Процессуальная психология (Минделл)
+│   ├── adizes/                # Методология Адизеса — PAEI, лидерство
+│   ├── litvak/                # Психологическое айкидо (Литвак)
+│   ├── integral/              # Интеграция всех подходов
 │   ├── techniques/            # Техники и упражнения
 │   ├── faq/                   # FAQ
 │   ├── queries/               # Сохранённые ответы
@@ -33,7 +39,30 @@ pl-chat/
 ### Оглавление
 
 - **[ННО (Ненасильственное общение)](src/content/docs/nvc/index.md)** — 4 компонента ННО, принципы, применение
+  - [4 компонента ННО](src/content/docs/nvc/4-components.md) — детальный разбор с примерами
 - **[Юнгианская психология](src/content/docs/jung/index.md)** — архетипы, коллективное бессознательное, индивидуация
+  - [Архетипы и коллективное бессознательное](src/content/docs/jung/archetypes.md) — универсальные паттерны психики
+  - [Тень](src/content/docs/jung/shadow.md) — архетип вытесненных качеств, проекции
+- **[MBTI — Типология Майерс-Бриггс](src/content/docs/mbti/index.md)** — 8 когнитивных функций, 16 типов личности
+- **[Логотерапия Виктора Франкла](src/content/docs/frankl/index.md)** — поиск смысла, экзистенциальный вакуум
+  - [Три источника смысла](src/content/docs/frankl/three-sources-of-meaning.md) — ценности творчества, переживания, установки
+  - [Парадоксальная интенция](src/content/docs/frankl/paradoxical-intention.md) — метод работы с фобиями
+- **[Интегральная теория Кена Уилбера](src/content/docs/wilber/index.md)** — AQAL-модель, уровни, линии
+  - [AQAL-модель: четыре квадранта](src/content/docs/wilber/aqal-four-quadrants.md) — I/It/We/Its, Spiral Dynamics
+- **[Процессуальная психология Арнольда Минделла](src/content/docs/mindell/index.md)** — dreambody, глубинная демократия
+  - [Dreambody: тело сновидения](src/content/docs/mindell/dreambody.md) — единство симптомов и сновидений
+- **[Методология Ицхака Адизеса](src/content/docs/adizes/index.md)** — PAEI-роли, жизненный цикл, лидерство
+  - [PAEI-роли по Адизесу](src/content/docs/adizes/paei-roles.md) — четыре роли и миф об идеальном менеджере
+- **[Психологическое айкидо Михаила Литвака](src/content/docs/litvak/index.md)** — амортизация, конфликты
+  - [Метод амортизации](src/content/docs/litvak/amortization.md) — виды амортизации, формула ДА—ЧУВСТВА—ВОПРОС
+- **[Интеграция подходов](src/content/docs/integral/index.md)** — синтез всех подходов
+- **[Техники и упражнения](src/content/docs/techniques/index.md)** — практические техники
+  - [Техника ННО: 4 шага](src/content/docs/techniques/nvc-4-steps.md) — пошаговое применение
+  - [Работа с Тенью](src/content/docs/techniques/shadow-work.md) — дневник, активное воображение
+  - [Техника парадоксальной интенции](src/content/docs/techniques/paradoxical-intention-exercise.md) — метод при фобиях
+  - [Техника амортизации в конфликте](src/content/docs/techniques/amortization-exercise.md) — формула и сценарии
+- **[FAQ](src/content/docs/faq/index.md)** — часто задаваемые вопросы
+- **[Queries](src/content/docs/queries/index.md)** — сохранённые ответы
 
 ---
 

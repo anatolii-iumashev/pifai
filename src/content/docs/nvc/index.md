@@ -7,6 +7,10 @@ description: "Введение в Ненасильственное общени�
 
 **Ненасильственное общение (ННО)** — это процесс общения, разработанный Маршалом Розенбергом, который помогает людям соединяться с собственными чувствами и потребностями, а также с чувствами и потребностями других людей.
 
+## Страницы раздела
+
+- [4 компонента ННО](./4-components.md) — детальный разбор наблюдения, чувств, потребностей и просьбы с примерами
+
 ## 4 компонента ННО
 
 1. **Наблюдение** — факты без оценок и интерпретаций
@@ -18,3 +22,4 @@ description: "Введение в Ненасильственное общени�
 
 - [Marshall Rosenberg - CNVC](https://www.cnvc.org/)
 - [Nonviolent Communication: A Language of Life](https://www.amazon.com/Nonviolent-Communication-Language-Changing-Relationships/dp/189200528X)
+- [Ненасильственное общение: принципы и техника Розенберга](https://media.halvacard.ru/life/nenasilstvennoe-obshhenie-principy-i-texnika-rozenberga/)

@@ -7,6 +7,11 @@ description: "Введение в аналитическую психологи�
 
 **Аналитическая психология** — направление в психологии, основанное Карлом Густавом Юнгом, исследующее глубинные слои психики.
 
+## Страницы раздела
+
+- [Архетипы и коллективное бессознательное](./archetypes.md) — универсальные паттерны психики, их проявления в снах и культуре
+- [Тень](./shadow.md) — архетип вытесненных качеств, проекции и путь к целостности
+
 ### Ключевые понятия
 
 - **Коллективное бессознательное** — общие для всего человечества психические структуры
@@ -20,3 +25,5 @@ description: "Введение в аналитическую психологи�
 
 - [Carl Jung Institute](https://www.jungiananalysis.org/)
 - [The Collected Works of C.G. Jung](https://www.amazon.com/Collected-Works-C-G-Jung/dp/0691098921)
+- [Carl Jung: Analytical Psychology](https://www.psychologistworld.com/cognitive/carl-jung-analytical-psychology)
+- [Introduction to Carl Jung — Academy of Ideas](https://academyofideas.com/2016/01/introduction-to-carl-jung-the-psyche-archetypes-and-the-collective-unconscious/)

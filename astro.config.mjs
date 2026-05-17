@@ -22,8 +22,13 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "База знаний pl-chat",
-      description: "Психологический чат-бот на основе ННО Маршала Розенберга и Юнгианской психологии.",
+      description: "Психологический чат-бот: ННО, юнгианство, логотерапия, MBTI, интегральный подход и практические техники.",
       sidebar: [
+        {
+          label: "MBTI — Типология",
+          collapsed: true,
+          items: [{ autogenerate: { directory: "mbti" } }],
+        },
         {
           label: "Ненасильственное общение (ННО)",
           collapsed: false,
@@ -35,19 +40,39 @@ export default defineConfig({
           items: [{ autogenerate: { directory: "jung" } }],
         },
         {
-          label: "Психология",
+          label: "Логотерапия Франкла",
           collapsed: true,
-          items: [{ autogenerate: { directory: "psychology" } }],
+          items: [{ autogenerate: { directory: "frankl" } }],
+        },
+        {
+          label: "Интегральная теория Уилбера",
+          collapsed: true,
+          items: [{ autogenerate: { directory: "wilber" } }],
+        },
+        {
+          label: "Процессуальная психология Минделла",
+          collapsed: true,
+          items: [{ autogenerate: { directory: "mindell" } }],
+        },
+        {
+          label: "Методология Адизеса",
+          collapsed: true,
+          items: [{ autogenerate: { directory: "adizes" } }],
+        },
+        {
+          label: "Психологическое айкидо Литвака",
+          collapsed: true,
+          items: [{ autogenerate: { directory: "litvak" } }],
+        },
+        {
+          label: "Интеграция подходов",
+          collapsed: true,
+          items: [{ autogenerate: { directory: "integral" } }],
         },
         {
           label: "Техники и упражнения",
           collapsed: true,
           items: [{ autogenerate: { directory: "techniques" } }],
-        },
-        {
-          label: "Руководства",
-          collapsed: true,
-          items: [{ autogenerate: { directory: "how-to" } }],
         },
         {
           label: "FAQ",

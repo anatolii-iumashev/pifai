@@ -15,9 +15,15 @@ pl-chat/
 │       └── MMDD/              # Month + Day (e.g. 0501 = May 1)
 │           └── file.{md,pdf}  # Source files
 ├── src/content/docs/          # ★ WIKI PAGES — you write and maintain these
-│   ├── nvc/                   # Nonviolent Communication (ННО)
+│   ├── nvc/                   # Nonviolent Communication / ННО (Розенберг)
 │   ├── jung/                  # Carl Jung / Юнгианская психология
-│   ├── psychology/            # Общая психология
+│   ├── mbti/                  # MBTI — 8 когнитивных функций, 16 типов
+│   ├── frankl/                # Логотерапия Виктора Франкла
+│   ├── wilber/                # Интегральная теория Кена Уилбера (AQAL)
+│   ├── mindell/               # Процессуальная психология Арнольда Минделла
+│   ├── adizes/                # Методология Ицхака Адизеса (PAEI)
+│   ├── litvak/                # Психологическое айкидо Михаила Литвака
+│   ├── integral/              # Интеграция всех подходов
 │   ├── techniques/            # Техники и упражнения
 │   ├── faq/                   # FAQ и сравнения
 │   ├── queries/               # Filed answers from user queries
@@ -92,7 +98,13 @@ When asked to ingest a source:
 4. **Create/update pages** in the appropriate `src/content/docs/` subdirectory:
    - ННО / NVC concepts → `nvc/`
    - Юнгианская психология → `jung/`
-   - Общая психология → `psychology/`
+   - MBTI / Типология → `mbti/`
+   - Логотерапия Франкла → `frankl/`
+   - Интегральная теория Уилбера → `wilber/`
+   - Процессуальная психология Минделла → `mindell/`
+   - Методология Адизеса → `adizes/`
+   - Психологическое айкидо Литвака → `litvak/`
+   - Интеграция подходов → `integral/`
    - Практические техники → `techniques/`
    - FAQ/comparisons → `faq/`
    - If a new category is needed → propose it to the user
@@ -182,7 +194,7 @@ All wiki skills must enforce:
 ## General Rules
 
 - **Ссылки в исходниках — всегда с `.md`:** все относительные ссылки на wiki-страницы (`[text](./path/page.md)`) пишутся с расширением `.md`. Для index-файлов каталогов — `./category/index.md`. Это нужно для работы ссылок в VS Code и GitHub. НИКОГДА не пиши ссылки без `.md`, НИКОГДА не пиши ссылки с `/` в конце вместо `.md`.
-- **Focus:** База знаний про **ННО (Маршал Розенберг), Юнгианскую психологию, практические техники**.
+- **Focus:** База знаний про **ННО (Маршал Розенберг), Юнгианскую психологию, MBTI, логотерапию (Франкл), интегральную теорию (Уилбер), процессуальную психологию (Минделл), методологию Адизеса, психологическое айкидо (Литвак), практические техники**.
 - **Language**: All wiki content in Russian (ru-RU)
 - **Tone**: Эмпатичный, точный, без воды, с уважением к теме
 - **Sources**: When ingesting, preserve links to original sources
@@ -192,4 +204,4 @@ All wiki skills must enforce:
 
 ## When New Categories Emerge
 
-If content doesn't fit existing directories, propose a new one to the user before creating it. Example categories that might emerge: `emotions/`, `needs/`, `archetypes/`, `dreams/`, `communication/`.
+If content doesn't fit existing directories, propose a new one to the user before creating it. Example categories that might emerge: `emotions/`, `needs/`, `archetypes/`, `dreams/`, `communication/`, `somatics/`, `leadership/`.
