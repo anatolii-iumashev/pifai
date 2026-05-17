@@ -95,5 +95,5 @@ description: "Практика ведения дневника для разви
 ## Материалы и источники
 
 - [Эмоции и потребности](../basics/emotions-and-needs.md) — теория связи эмоций и потребностей
-- [4 компонента ННО](../authors/nvc/4-components.md) — смежная техника для общения
+- [4 компонента ННО](../authors/rosenberg/4-components.md) — смежная техника для общения
 - [Оригинальная статья о базовых потребностях](https://medalvian.ru/zhurnal/chto-takoe-bazovye-emocionalnye-potrebnosti/)

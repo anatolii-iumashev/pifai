@@ -6,10 +6,10 @@ const isGitHubPagesBuild = process.env.GITHUB_ACTIONS === "true";
 
 const SITE_URL = process.env.CNAME
   ? `https://${process.env.CNAME}`
-  : "https://anatolii-iumashev.github.io/pl-chat";
+  : "https://anatolii-iumashev.github.io/pif";
 
-  // Use /pl-chat only for GitHub Pages CI builds; keep local dev/preview on root.
-const BASE = process.env.CNAME ? "/" : (isGitHubPagesBuild ? "/pl-chat" : "/");
+  // Use /pif only for GitHub Pages CI builds; keep local dev/preview on root.
+const BASE = process.env.CNAME ? "/" : (isGitHubPagesBuild ? "/pif" : "/");
 
 export default defineConfig({
   site: SITE_URL,
@@ -49,9 +49,9 @@ export default defineConfig({
           collapsed: true,
           items: [
             {
-              label: "ННО — Маршалл Розенберг",
+              label: "Маршалл Розенберг (ННО)",
               collapsed: true,
-              items: [{ autogenerate: { directory: "authors/nvc" } }],
+              items: [{ autogenerate: { directory: "authors/rosenberg" } }],
             },
             {
               label: "Юнгианская психология",
@@ -124,13 +124,13 @@ export default defineConfig({
         root: { label: "Русский", lang: "ru" },
       },
       editLink: {
-        baseUrl: 'https://github.com/anatolii-iumashev/pl-chat/tree/main',
+        baseUrl: 'https://github.com/anatolii-iumashev/pif/tree/main',
       },
       social: [
         {
           icon: "github",
           label: "GitHub",
-          href: "https://github.com/anatolii-iumashev/pl-chat",
+          href: "https://github.com/anatolii-iumashev/pif",
         },
       ],
 

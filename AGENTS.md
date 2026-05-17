@@ -106,7 +106,7 @@ When asked to ingest a source:
    - Проблемы, запросы, use cases → `use-cases/`
    - Техники и упражнения → `practices/`
    - Вдохновляющие цитаты → `quotes/`
-   - ННО / NVC concepts → `authors/nvc/`
+   - ННО / NVC concepts → `authors/rosenberg/`
    - Юнгианская психология → `authors/jung/`
    - Логотерапия Франкла → `authors/frankl/`
    - Интегральная теория Уилбера → `authors/wilber/`

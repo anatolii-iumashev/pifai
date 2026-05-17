@@ -45,6 +45,6 @@ description: "Пошаговая техника применения 4 комп�
 
 ## Материалы и источники
 
-- [4 компонента ННО](../authors/nvc/4-components.md)
-- [ННО — Введение](../authors/nvc/index.md)
+- [4 компонента ННО](../authors/rosenberg/4-components.md)
+- [ННО — Введение](../authors/rosenberg/index.md)
 - [Ненасильственное общение: принципы и техника Розенберга](https://media.halvacard.ru/life/nenasilstvennoe-obshhenie-principy-i-texnika-rozenberga/)

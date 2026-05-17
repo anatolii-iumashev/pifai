@@ -48,7 +48,7 @@ Chronological log of all wiki operations.
   - authors/jung/archetypes.md — формирование Тени, проявления, шаги для начинающих
   - authors/jung/shadow.md — дополнены источники
   - authors/frankl/index.md — три опоры, сравнение с психоанализом, роль терапевта
-  - authors/nvc/index.md — формула ННО, две стороны, ключевые принципы
+  - authors/rosenberg/index.md — формула ННО, две стороны, ключевые принципы
   - basics/index.md, use-cases/index.md, quotes/index.md, practices/index.md — обновлены списки
   - index.md — добавлены все новые страницы в каталог
 - Sources: akademik.expert, medalvian.ru, smclinic.ru, bemeta.co, talentsy.ru, 16personalities.com, baynvc.org, viktorfranklamerica.com, tolstoy.ru
@@ -64,7 +64,7 @@ Chronological log of all wiki operations.
   - adizes-paei-code-leadership.md — PAEI-роли, миф об идеальном руководителе (skillbox.ru, adizes.ru)
   - litvak-psychological-aikido-amortization.md — Метод амортизации, психологическое айкидо (goodo.pro, litvak.me)
 - Создано страниц: 13
-  - authors/nvc/4-components.md
+  - authors/rosenberg/4-components.md
   - authors/jung/archetypes.md, authors/jung/shadow.md
   - authors/frankl/three-sources-of-meaning.md, authors/frankl/paradoxical-intention.md
   - authors/wilber/aqal-four-quadrants.md

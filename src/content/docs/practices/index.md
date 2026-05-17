@@ -19,7 +19,7 @@ description: "Практические техники и упражнения и
 
 ## Материалы и источники
 
-- [ННО — 4 компонента](../authors/nvc/index.md)
+- [ННО — 4 компонента](../authors/rosenberg/index.md)
 - [Юнгианская психология](../authors/jung/index.md)
 - [Логотерапия](../authors/frankl/index.md)
 - [Психологическое айкидо](../authors/litvak/index.md)

@@ -114,5 +114,5 @@ description: "Базовая эмоциональная грамотность: 
 
 - [Оригинальная статья](https://medalvian.ru/zhurnal/chto-takoe-bazovye-emocionalnye-potrebnosti/)
 - [Дневник эмоций и потребностей](../practices/emotional-diary.md)
-- [4 компонента ННО](../authors/nvc/4-components.md)
+- [4 компонента ННО](../authors/rosenberg/4-components.md)
 - [Что такое психика](./what-is-psyche.md)

@@ -39,8 +39,8 @@ description: "База знаний чат-бота ПиФ: ННО, юнгиан
 ## 5. Авторы и школы
 
 - [Авторы и школы](./authors/index.md) — ключевые идеи авторов и подходов
-  - [ННО — Маршалл Розенберг](./authors/nvc/index.md)
-    - [4 компонента ННО](./authors/nvc/4-components.md)
+  - [ННО — Маршалл Розенберг](./authors/rosenberg/index.md)
+    - [4 компонента ННО](./authors/rosenberg/4-components.md)
   - [Юнгианская психология — Карл Юнг](./authors/jung/index.md)
     - [Архетипы и коллективное бессознательное](./authors/jung/archetypes.md)
     - [Тень](./authors/jung/shadow.md)
