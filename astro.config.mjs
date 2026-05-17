@@ -1,0 +1,98 @@
+import { defineConfig } from "astro/config";
+import starlight from "@astrojs/starlight";
+import { remarkStripMdLinks } from "./src/remark-strip-md-links.mjs";
+
+const isGitHubPagesBuild = process.env.GITHUB_ACTIONS === "true";
+
+const SITE_URL = process.env.CNAME
+  ? `https://${process.env.CNAME}`
+  : "https://aa.github.io/pl-chat";
+
+// Use /pl-chat only for GitHub Pages CI builds; keep local dev/preview on root.
+const BASE = process.env.CNAME ? "/" : (isGitHubPagesBuild ? "/pl-chat" : "/");
+
+export default defineConfig({
+  site: SITE_URL,
+  base: BASE,
+
+  markdown: {
+    remarkPlugins: [remarkStripMdLinks],
+  },
+
+  integrations: [
+    starlight({
+      title: "База знаний pl-chat",
+      description: "Психологический чат-бот на основе ННО Маршала Розенберга и Юнгианской психологии.",
+      sidebar: [
+        {
+          label: "ННО (Ненасильственное общение)",
+          collapsed: false,
+          autogenerate: { directory: "nvc" },
+        },
+        {
+          label: "Юнгианская психология",
+          collapsed: true,
+          autogenerate: { directory: "jung" },
+        },
+        {
+          label: "Психология",
+          collapsed: true,
+          autogenerate: { directory: "psychology" },
+        },
+        {
+          label: "Техники и упражнения",
+          collapsed: true,
+          autogenerate: { directory: "techniques" },
+        },
+        {
+          label: "Руководства",
+          collapsed: true,
+          autogenerate: { directory: "how-to" },
+        },
+        {
+          label: "FAQ",
+          collapsed: true,
+          autogenerate: { directory: "faq" },
+        },
+      ],
+
+      head: [
+        {
+          tag: "link",
+          attrs: {
+            rel: "icon",
+            type: "image/png",
+            href: "/favicon.png",
+          },
+        },
+      ],
+      components: {
+        Sidebar: "starlight-theme-obsidian/overrides/Sidebar.astro",
+        PageFrame: "starlight-theme-obsidian/overrides/PageFrame.astro",
+        PageSidebar: "./src/components/PageSidebar.astro",
+        Pagination: "starlight-theme-obsidian/overrides/Pagination.astro",
+        ThemeSelect: "starlight-theme-obsidian/overrides/ThemeSelect.astro",
+      },
+      customCss: [
+        "starlight-theme-obsidian/styles/layers.css",
+        "starlight-theme-obsidian/styles/theme.css",
+        "starlight-theme-obsidian/styles/centered-reading.css",
+        "starlight-theme-obsidian/styles/common.css",
+      ],
+      locales: {
+        root: { label: "Русский", lang: "ru" },
+      },
+      editLink: {
+        baseUrl: 'https://github.com/anatolii-iumashev/pl-chat/tree/main',
+      },
+      social: [
+        {
+          icon: "github",
+          label: "GitHub",
+          href: "https://github.com/anatolii-iumashev/pl-chat",
+        },
+      ],
+
+    }),
+  ],
+});
