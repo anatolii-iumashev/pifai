@@ -118,7 +118,47 @@ pl-chat/
   - [Queries](src/content/docs/addons/queries/index.md)
 
 ---
+## 🤖 Чат-бот (Telegram)
 
+Проект включает Telegram-бота на стеке **Bun + Elysia + Cloudflare Workers + Groq (Llama-3.3-70B)**.
+
+### Структура
+
+```
+bot/
+├── src/
+│   ├── index.ts           # Elysia app + webhook
+│   ├── bot.ts             # Обработчики Telegram
+│   ├── knowledge.ts       # База знаний (статическая сборка)
+│   ├── llm.ts             # Клиент Groq
+│   ├── session.ts         # История чатов (Cloudflare KV)
+│   ├── prompts.ts         # System prompt + шаблоны
+│   └── utils.ts           # Вспомогательные функции
+├── scripts/
+│   └── build-knowledge.ts # Скрипт сборки знаний из src/content/docs/
+├── wrangler.toml
+├── package.json
+└── .dev.vars
+```
+
+### Быстрый старт
+
+```bash
+cd bot
+npm install
+# Заполнить .dev.vars токенами
+npm run dev          # Локальный запуск
+npm run build        # Сборка базы знаний
+npm run deploy       # Деплой в Cloudflare Workers
+```
+
+### Команды бота
+
+- `/start` — начать диалог
+- `/help` — справка
+- `/clear` — сбросить историю
+
+---
 ## �️ Дорожная карта
 
 Планы по развитию проекта «ПиФ»:
