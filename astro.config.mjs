@@ -124,13 +124,13 @@ export default defineConfig({
         root: { label: "Русский", lang: "ru" },
       },
       editLink: {
-        baseUrl: 'https://github.com/anatolii-iumashev/pif/tree/main',
+        baseUrl: 'https://github.com/anatolii-iumashev/pifai/tree/main',
       },
       social: [
         {
           icon: "github",
           label: "GitHub",
-          href: "https://github.com/anatolii-iumashev/pif",
+          href: "https://github.com/anatolii-iumashev/pifai",
         },
       ],
 
