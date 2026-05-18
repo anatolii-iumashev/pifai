@@ -1,16 +1,19 @@
 name = "pif-bot"
 main = "src/index.ts"
 compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
 
 # Session storage
 [[kv_namespaces]]
 binding = "SESSIONS"
-id = ""
-preview_id = ""
+id = "d55d094129a9424dadafc440ed18194b"
+preview_id = "d55d094129a9424dadafc440ed18194b"
 
-# Environment variables (secrets in production)
+# Environment variables
 [vars]
-TELEGRAM_BOT_TOKEN = ""
-GROQ_API_KEY = ""
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "llama-3.1-8b-instant"
 KNOWLEDGE_VERSION = "1.0.0"
+
+# Secrets (set via wrangler secret put)
+# TELEGRAM_BOT_TOKEN
+# GROQ_API_KEY

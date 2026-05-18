@@ -1,10 +1,8 @@
 /**
  * session.ts — История чатов через Cloudflare KV
- *
- * Хранит последние N сообщений для каждого пользователя.
  */
 
-const MAX_HISTORY = 20; // храним последние 20 сообщений
+const MAX_HISTORY = 20;
 
 export interface SessionMessage {
   role: 'user' | 'assistant';
@@ -18,12 +16,8 @@ export interface SessionStore {
   clear(userId: number): Promise<void>;
 }
 
-interface Env {
-  SESSIONS?: KVNamespace;
-}
-
-export function initSessionStore(env?: Env): SessionStore {
-  const kv = env?.SESSIONS;
+export function initSessionStore(env: { SESSIONS?: KVNamespace }): SessionStore {
+  const kv = env.SESSIONS;
 
   return {
     async get(userId: number): Promise<SessionMessage[]> {
@@ -40,11 +34,9 @@ export function initSessionStore(env?: Env): SessionStore {
       if (!kv) return;
       const history = await this.get(userId);
       history.push(message);
-
-      // Оставляем только последние MAX_HISTORY сообщений
       const trimmed = history.slice(-MAX_HISTORY);
       await kv.put(`session:${userId}`, JSON.stringify(trimmed), {
-        expirationTtl: 86400 * 7, // 7 дней
+        expirationTtl: 86400 * 7,
       });
     },
 

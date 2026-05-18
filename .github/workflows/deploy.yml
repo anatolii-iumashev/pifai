@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy
 
 on:
   push:
@@ -13,7 +13,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  # === Wiki: build & deploy to GitHub Pages ===
+  build-wiki:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,8 +29,8 @@ jobs:
         with:
           path: ./dist
 
-  deploy:
-    needs: build
+  deploy-wiki:
+    needs: build-wiki
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -40,3 +41,30 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # === Bot: build & deploy to Cloudflare Workers ===
+  deploy-bot:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: bot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: bot/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          workingDirectory: bot
+          secrets: |
+            TELEGRAM_BOT_TOKEN
+            GROQ_API_KEY
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}

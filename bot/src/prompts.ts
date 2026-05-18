@@ -46,7 +46,6 @@ ${knowledgeBase}
 
 ### 6. Язык
 Отвечай на том же языке, что и собеседник. Помоги сформулировать запрос, если нужно.`;
-`;
 }
 
 export function CRISIS_DETECTION_PROMPT(): string {

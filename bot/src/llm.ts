@@ -1,8 +1,6 @@
 /**
- * llm.ts — Клиент Groq API
+ * llm.ts — Клиент Groq API (CF Workers compatible)
  */
-
-import Groq from 'groq-sdk';
 
 export interface LLMConfig {
   apiKey: string;
@@ -11,44 +9,32 @@ export interface LLMConfig {
 
 export interface LLMClient {
   chat(messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>): Promise<string>;
-  chatStream(
-    messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>,
-    onChunk: (chunk: string) => void,
-  ): Promise<string>;
 }
 
 export function initLLM(config: LLMConfig): LLMClient {
-  const groq = new Groq({ apiKey: config.apiKey });
-
   return {
     async chat(messages) {
-      const completion = await groq.chat.completions.create({
-        model: config.model,
-        messages,
-        temperature: 0.7,
-        max_tokens: 2048,
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${config.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: config.model,
+          messages,
+          temperature: 0.7,
+          max_tokens: 2048,
+        }),
       });
 
-      return completion.choices[0]?.message?.content || '';
-    },
-
-    async chatStream(messages, onChunk) {
-      const stream = await groq.chat.completions.create({
-        model: config.model,
-        messages,
-        temperature: 0.7,
-        max_tokens: 2048,
-        stream: true,
-      });
-
-      let fullContent = '';
-      for await (const chunk of stream) {
-        const content = chunk.choices[0]?.delta?.content || '';
-        fullContent += content;
-        onChunk(content);
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`Groq API error ${response.status}: ${err}`);
       }
 
-      return fullContent;
+      const data = await response.json() as any;
+      return data.choices?.[0]?.message?.content || '';
     },
   };
 }

@@ -116,7 +116,7 @@ const output = `/**
 export const KNOWLEDGE_BASE = \`${knowledgeBase.replace(/`/g, '\\`')}\`;
 
 export const KNOWLEDGE_METADATA = {
-  version: process.env.KNOWLEDGE_VERSION || '1.0.0',
+  version: '1.0.0',
   totalPages: ${pages.length},
   totalTokens: ${totalTokens},
   generatedAt: '${new Date().toISOString()}',
