@@ -118,27 +118,28 @@ pl-chat/
   - [Queries](src/content/docs/addons/queries/index.md)
 
 ---
+---
 ## 🤖 Чат-бот (Telegram)
 
-Проект включает Telegram-бота на стеке **Bun + Elysia + Cloudflare Workers + Groq (Llama-3.3-70B)**.
+Telegram-бот на стеке **Node.js + Cloudflare Workers + Groq (Llama-3.3-70B)** с базой знаний из вики.
 
-### Структура
+### Архитектура
 
 ```
 bot/
 ├── src/
-│   ├── index.ts           # Elysia app + webhook
+│   ├── index.ts           # Cloudflare Workers entry (webhook + health)
 │   ├── bot.ts             # Обработчики Telegram
-│   ├── knowledge.ts       # База знаний (статическая сборка)
-│   ├── llm.ts             # Клиент Groq
+│   ├── knowledge.ts       # База знаний (конденсированная для TPM-лимитов)
+│   ├── llm.ts             # Клиент Groq (raw fetch, CF Workers compatible)
 │   ├── session.ts         # История чатов (Cloudflare KV)
 │   ├── prompts.ts         # System prompt + шаблоны
 │   └── utils.ts           # Вспомогательные функции
 ├── scripts/
 │   └── build-knowledge.ts # Скрипт сборки знаний из src/content/docs/
-├── wrangler.toml
+├── wrangler.toml          # Cloudflare Workers конфиг
 ├── package.json
-└── .dev.vars
+└── .dev.vars              # Локальные переменные (не коммитить)
 ```
 
 ### Быстрый старт
@@ -147,10 +148,19 @@ bot/
 cd bot
 npm install
 # Заполнить .dev.vars токенами
-npm run dev          # Локальный запуск
-npm run build        # Сборка базы знаний
-npm run deploy       # Деплой в Cloudflare Workers
+npm run dev            # Локальный запуск (Node.js long polling)
+npm run build          # Сборка базы знаний из вики
+npm run deploy         # Деплой в Cloudflare Workers
 ```
+
+### Статус
+
+- ✅ Работает на **Cloudflare Workers** — без постоянного сервера
+- ✅ Webhook от Telegram через `POST /webhook`
+- ✅ Long polling для локальной разработки (`npm run dev`)
+- ✅ История сессий в KV (7 дней, 20 сообщений)
+- ✅ Retry при rate limit Groq
+- ✅ Дисклеймер после каждого ответа
 
 ### Команды бота
 
