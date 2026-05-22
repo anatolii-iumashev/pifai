@@ -1,6 +1,6 @@
 name = "pif-bot"
 main = "src/index.ts"
-compatibility_date = "2026-05-01"
+compatibility_date = "2026-05-21"
 compatibility_flags = ["nodejs_compat"]
 
 # Session storage
@@ -11,8 +11,9 @@ preview_id = "d55d094129a9424dadafc440ed18194b"
 
 # Environment variables
 [vars]
-GROQ_MODEL = "llama-3.1-8b-instant"
+GROQ_MODEL = "llama-3.3-70b-versatile"
 KNOWLEDGE_VERSION = "1.0.0"
+NODE_ENV = "production"
 
 # Secrets (set via wrangler secret put)
 # TELEGRAM_BOT_TOKEN

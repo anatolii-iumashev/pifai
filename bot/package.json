@@ -4,17 +4,19 @@
   "description": "ПиФ — эмпатичный психологический чат-бот на основе базы знаний Психология и Философия",
   "type": "module",
   "scripts": {
-    "dev": "node --env-file=.dev.vars --import tsx src/index.ts",
-    "start": "node --env-file=.dev.vars --import tsx src/index.ts",
+    "dev": "node --env-file=.dev.vars --import tsx src/dev-server.ts",
+    "start": "node --env-file=.dev.vars --import tsx src/dev-server.ts",
     "build": "tsx scripts/build-knowledge.ts",
     "deploy": "wrangler deploy",
     "preview": "wrangler dev"
   },
   "dependencies": {
+    "hono": "^4.0.0",
     "telegraf": "^4.16.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.2025.0",
+    "@types/node": "^20.14.0",
     "tsx": "^4.22.1",
     "typescript": "^5.7.0",
     "wrangler": "^4.0.0"

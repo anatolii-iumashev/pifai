@@ -1,8 +1,14 @@
-import { createBot } from './bot';
+import { Hono } from 'hono';
+import { createBot, processUserMessage } from './bot';
 import { initLLM } from './llm';
 import { initSessionStore } from './session';
 import { KNOWLEDGE_BASE } from './knowledge';
 import { SYSTEM_PROMPT } from './prompts';
+import { renderChatPage } from './ui';
+import type { LLMClient } from './llm';
+import type { SessionStore } from './session';
+
+type KVNamespace = any;
 
 export interface Env {
   TELEGRAM_BOT_TOKEN: string;
@@ -13,56 +19,97 @@ export interface Env {
 }
 
 let botInstance: ReturnType<typeof createBot> | null = null;
+let llm: LLMClient | null = null;
+let sessions: SessionStore | null = null;
+const systemPrompt = SYSTEM_PROMPT(KNOWLEDGE_BASE);
 
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
+function ensureRuntime(env?: Partial<Env>) {
+  const runtimeEnv = {
+    ...(typeof process !== 'undefined' ? process.env : {}),
+    ...env,
+  } as Env;
 
-    // GET / — info
-    if (request.method === 'GET' && url.pathname === '/') {
-      return new Response('ПиФ бот работает. Используй POST /webhook для Telegram.', {
-        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-      });
+  if (!llm) {
+    if (!runtimeEnv.GROQ_API_KEY) {
+      throw new Error('Missing GROQ_API_KEY');
+    }
+    llm = initLLM({ apiKey: runtimeEnv.GROQ_API_KEY, model: runtimeEnv.GROQ_MODEL || 'llama-3.3-70b-versatile' });
+  }
+
+  if (!sessions) {
+    sessions = initSessionStore(runtimeEnv);
+  }
+
+  if (!botInstance) {
+    if (!runtimeEnv.TELEGRAM_BOT_TOKEN) {
+      throw new Error('Missing TELEGRAM_BOT_TOKEN');
+    }
+    botInstance = createBot({
+      token: runtimeEnv.TELEGRAM_BOT_TOKEN,
+      llm,
+      sessions,
+      systemPrompt,
+    });
+  }
+
+  return { llm, sessions } as { llm: LLMClient; sessions: SessionStore };
+}
+
+const app = new Hono<{ Bindings: Env }>();
+
+app.get('/', (c) => c.redirect('/ui'));
+
+app.get('/ui', (c) => c.html(renderChatPage()));
+
+app.get('/health', (c) => {
+  const env = c.env;
+  return c.json({
+    status: 'ok',
+    hasSecrets: !!env.TELEGRAM_BOT_TOKEN && !!env.GROQ_API_KEY,
+    knowledgeVersion: env.KNOWLEDGE_VERSION || '1.0.0',
+  });
+});
+
+app.post('/webhook', async (c) => {
+  try {
+    const env = c.env;
+    ensureRuntime(env);
+    const update = await c.req.json();
+    await botInstance!.handleUpdate(update);
+    return c.text('ok');
+  } catch (error) {
+    console.error('Webhook error:', error);
+    return c.text('ok', 200);
+  }
+});
+
+app.post('/api/chat', async (c) => {
+  try {
+    const env = c.env;
+    const runtime = ensureRuntime(env);
+    const body = await c.req.json();
+    const message = body?.message;
+    const userId = body?.userId ?? 'web';
+
+    if (!message || typeof message !== 'string') {
+      return c.json({ error: 'Invalid request body: message is required' }, 400);
     }
 
-    // GET /health — health check
-    if (request.method === 'GET' && url.pathname === '/health') {
-      return new Response(JSON.stringify({
-        status: 'ok',
-        hasSecrets: !!env.TELEGRAM_BOT_TOKEN && !!env.GROQ_API_KEY,
-        knowledgeVersion: env.KNOWLEDGE_VERSION || '1.0.0',
-      }), { headers: { 'Content-Type': 'application/json' } });
-    }
+    const answer = await processUserMessage({
+      userId,
+      message,
+      llm: runtime.llm,
+      sessions: runtime.sessions,
+      systemPrompt,
+    });
 
-    // POST /webhook — Telegram updates
-    if (request.method === 'POST' && url.pathname === '/webhook') {
-      try {
-        // Lazy init bot
-        if (!botInstance) {
-          if (!env.TELEGRAM_BOT_TOKEN || !env.GROQ_API_KEY) {
-            return new Response('Missing secrets', { status: 500 });
-          }
-          const llm = initLLM({ apiKey: env.GROQ_API_KEY, model: env.GROQ_MODEL || 'llama-3.1-8b-instant' });
-          const sessions = initSessionStore(env);
-          botInstance = createBot({
-            token: env.TELEGRAM_BOT_TOKEN,
-            llm,
-            sessions,
-            systemPrompt: SYSTEM_PROMPT(KNOWLEDGE_BASE),
-          });
-        }
+    return c.json({ answer });
+  } catch (error) {
+    console.error('API chat error:', error);
+    return c.json({ error: 'Не удалось обработать запрос, попробуйте позже' }, 500);
+  }
+});
 
-        // Parse update body
-        const update = await request.json();
-        await botInstance.handleUpdate(update);
-        return new Response('ok', { status: 200 });
-      } catch (error) {
-        console.error('Webhook error:', error);
-        return new Response('ok', { status: 200 }); // always 200 to stop retries
-      }
-    }
+app.all('*', (c) => c.text('Not found', 404));
 
-    // 404
-    return new Response('Not found', { status: 404 });
-  },
-};
+export default app;

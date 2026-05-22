@@ -5,13 +5,47 @@
 import { Telegraf } from 'telegraf';
 import type { LLMClient } from './llm';
 import type { SessionStore } from './session';
-import { HELP_TEXT, START_TEXT, CRISIS_RESPONSE } from './prompts';
+import { HELP_TEXT, START_TEXT } from './prompts';
 
 export interface BotConfig {
   token: string;
   llm: LLMClient;
   sessions: SessionStore;
   systemPrompt: string;
+}
+
+export interface ProcessMessageParams {
+  userId: string | number;
+  message: string;
+  llm: LLMClient;
+  sessions: SessionStore;
+  systemPrompt: string;
+}
+
+export async function processUserMessage(params: ProcessMessageParams): Promise<string> {
+  const { userId, message, llm, sessions, systemPrompt } = params;
+
+  const history = await sessions.get(userId);
+  const messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }> = [
+    { role: 'system', content: systemPrompt },
+    ...history.map((m) => ({ role: m.role, content: m.content })),
+    { role: 'user', content: message },
+  ];
+
+  const response = await llm.chat(messages);
+
+  await sessions.add(userId, {
+    role: 'user',
+    content: message,
+    timestamp: Date.now(),
+  });
+  await sessions.add(userId, {
+    role: 'assistant',
+    content: response,
+    timestamp: Date.now(),
+  });
+
+  return response;
 }
 
 export function createBot(config: BotConfig) {
@@ -39,36 +73,17 @@ export function createBot(config: BotConfig) {
     const userId = ctx.from.id;
     const userMessage = ctx.message.text;
 
-    // Показываем индикатор печатания
     await ctx.sendChatAction('typing');
 
     try {
-      // Получаем историю
-      const history = await config.sessions.get(userId);
-
-      // Собираем сообщения для LLM
-      const messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }> = [
-        { role: 'system', content: config.systemPrompt },
-        ...history.map(m => ({ role: m.role, content: m.content })),
-        { role: 'user', content: userMessage },
-      ];
-
-      // Отправляем запрос к LLM
-      const response = await config.llm.chat(messages);
-
-      // Сохраняем в историю
-      await config.sessions.add(userId, {
-        role: 'user',
-        content: userMessage,
-        timestamp: Date.now(),
-      });
-      await config.sessions.add(userId, {
-        role: 'assistant',
-        content: response,
-        timestamp: Date.now(),
+      const response = await processUserMessage({
+        userId,
+        message: userMessage,
+        llm: config.llm,
+        sessions: config.sessions,
+        systemPrompt: config.systemPrompt,
       });
 
-      // Отправляем ответ
       await ctx.reply(response, { parse_mode: 'Markdown' });
     } catch (error) {
       console.error('Bot error:', error);
