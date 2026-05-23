@@ -120,6 +120,31 @@ pl-chat/
   - [Queries](src/content/docs/addons/queries/index.md)
 
 ---
+---
+## 🤖 Чат-бот (Telegram)
+
+Telegram-бот на стеке **Node.js + Cloudflare Workers + Groq (Llama-3.3-70B)** с базой знаний из вики.
+
+### Архитектура
+
+```
+bot/
+├── src/
+│   ├── index.ts           # Cloudflare Workers entry (webhook + health)
+│   ├── bot.ts             # Обработчики Telegram
+│   ├── knowledge.ts       # База знаний (конденсированная для TPM-лимитов)
+│   ├── llm.ts             # Клиент Groq (raw fetch, CF Workers compatible)
+│   ├── session.ts         # История чатов (Cloudflare KV)
+│   ├── prompts.ts         # System prompt + шаблоны
+│   └── utils.ts           # Вспомогательные функции
+├── scripts/
+│   └── build-knowledge.ts # Скрипт сборки знаний из src/content/docs/
+├── wrangler.toml          # Cloudflare Workers конфиг
+├── package.json
+└── .dev.vars              # Локальные переменные (не коммитить)
+```
+
+### Быстрый старт
 
 ## 🛣️ Дорожная карта
 
