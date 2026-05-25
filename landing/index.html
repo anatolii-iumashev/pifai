@@ -94,6 +94,32 @@
   }
   .links a svg { width: 18px; height: 18px; opacity: 0.7; }
   .links a:hover svg { opacity: 1; }
+  .sound-toggle {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 3;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(200,200,220,0.5);
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    line-height: 1;
+  }
+  .sound-toggle:hover {
+    background: rgba(255,255,255,0.1);
+    color: rgba(200,200,220,0.9);
+  }
+  .sound-toggle.muted { opacity: 0.4; }
   .footer {
     position: fixed; bottom: 2rem;
     z-index: 2;
@@ -126,6 +152,7 @@
     </a>
   </div>
 </div>
+<button class="sound-toggle" id="soundBtn" onclick="toggleSound()">🔊</button>
 <div class="footer">ΠиФ 2026</div>
 <script>
 const canvas = document.getElementById('rain');
@@ -140,6 +167,61 @@ const drops = Array.from({ length: DROPS }, () => ({
   speed: 3 + Math.random() * 8, length: 12 + Math.random() * 24,
   opacity: 0.15 + Math.random() * 0.35, width: 0.5 + Math.random() * 1.2,
 }));
+// ─── Audio: rain noise via Web Audio API ───
+let audioCtx, noiseNode, gainNode, filterNode;
+let isPlaying = false;
+
+function createRainAudio() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  const bufferSize = audioCtx.sampleRate * 2;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+
+  noiseNode = audioCtx.createBufferSource();
+  noiseNode.buffer = buffer;
+  noiseNode.loop = true;
+
+  filterNode = audioCtx.createBiquadFilter();
+  filterNode.type = 'bandpass';
+  filterNode.frequency.value = 800;
+  filterNode.Q.value = 0.5;
+
+  gainNode = audioCtx.createGain();
+  gainNode.gain.value = 0.08;
+
+  noiseNode.connect(filterNode);
+  filterNode.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+}
+
+function toggleSound() {
+  const btn = document.getElementById('soundBtn');
+  if (isPlaying) {
+    gainNode.gain.value = 0;
+    btn.textContent = '🔇';
+    btn.classList.add('muted');
+    isPlaying = false;
+  } else {
+    if (!audioCtx) createRainAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    noiseNode.start(0);
+    gainNode.gain.value = 0.08;
+    btn.textContent = '🔊';
+    btn.classList.remove('muted');
+    isPlaying = true;
+  }
+}
+
+// Auto-start on first interaction
+document.addEventListener('click', () => {
+  if (!audioCtx && !isPlaying) toggleSound();
+}, { once: true });
+
+// ─── Rain animation ───
 function draw() {
   ctx.clearRect(0, 0, W, H);
   for (const d of drops) {
