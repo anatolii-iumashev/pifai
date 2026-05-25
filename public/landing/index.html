@@ -120,6 +120,35 @@
     color: rgba(200,200,220,0.9);
   }
   .sound-toggle.muted { opacity: 0.4; }
+  .preset-select {
+    position: fixed;
+    top: 1.5rem;
+    right: 4.5rem;
+    z-index: 3;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 0.4rem 0.6rem;
+    color: rgba(200,200,220,0.6);
+    font-size: 0.75rem;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  .preset-select:hover {
+    background: rgba(255,255,255,0.1);
+    color: rgba(200,200,220,0.9);
+    border-color: rgba(255,255,255,0.2);
+  }
+  .preset-select option {
+    background: #1a1f2e;
+    color: rgba(200,200,220,0.9);
+  }
   .footer {
     position: fixed; bottom: 2rem;
     z-index: 2;
@@ -152,6 +181,12 @@
     </a>
   </div>
 </div>
+<select class="preset-select" id="presetSelect" onchange="changePreset(this.value)">
+  <option value="0">🌧 Ливень</option>
+  <option value="1" selected>☔ Морось</option>
+  <option value="2">🌊 На крыше</option>
+  <option value="3">🎵 Мелодичный</option>
+</select>
 <button class="sound-toggle" id="soundBtn" onclick="toggleSound()">🔊</button>
 <div class="footer">ΠиФ 2026</div>
 <script>
@@ -167,51 +202,92 @@ const drops = Array.from({ length: DROPS }, () => ({
   speed: 3 + Math.random() * 8, length: 12 + Math.random() * 24,
   opacity: 0.15 + Math.random() * 0.35, width: 0.5 + Math.random() * 1.2,
 }));
-// ─── Audio: rain noise via Web Audio API ───
-let audioCtx, noiseNode, gainNode, filterNode;
+// ─── Audio engine — 4 rain presets via Web Audio API ───
+let audioCtx = null;
+let gainNode = null;
+let filterNode = null;
+let noiseNode = null;
 let isPlaying = false;
+let _noiseBuffer = null;
+let _pinkBuffer = null;
+let _currentPreset = 1;
 
-function createRainAudio() {
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const bufferSize = audioCtx.sampleRate * 2;
-  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-  noiseNode = audioCtx.createBufferSource();
-  noiseNode.buffer = buffer;
-  noiseNode.loop = true;
-  filterNode = audioCtx.createBiquadFilter();
-  filterNode.type = 'bandpass';
-  filterNode.frequency.value = 800;
-  filterNode.Q.value = 0.5;
-  gainNode = audioCtx.createGain();
-  gainNode.gain.value = 0.08;
-  noiseNode.connect(filterNode);
-  filterNode.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
+const PRESETS = [
+  { label: 'Ливень',    type: 'bandpass', freq: 800,  Q: 0.5, gain: 0.08, pink: false },
+  { label: 'Морось',    type: 'lowpass',  freq: 400,  Q: 1.0, gain: 0.06, pink: false },
+  { label: 'На крыше',  type: 'lowpass',  freq: 250,  Q: 0.8, gain: 0.07, pink: false },
+  { label: 'Мелодичный',type: 'lowpass',  freq: 350,  Q: 0.7, gain: 0.15, pink: true  },
+];
+
+function generatePinkNoise(length, rate) {
+  const buf = audioCtx.createBuffer(1, length, rate);
+  const d = buf.getChannelData(0);
+  let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+  for (let i = 0; i < d.length; i++) {
+    const w = Math.random()*2-1;
+    b0=0.99886*b0+w*0.0555179; b1=0.99332*b1+w*0.0750759;
+    b2=0.96900*b2+w*0.1538520; b3=0.86650*b3+w*0.3104856;
+    b4=0.55000*b4+w*0.5329522; b5=-0.7616*b5-w*0.0168980;
+    d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11;
+    b6=w*0.115926;
+  }
+  return buf;
 }
-
+function generateWhiteNoise(length, rate) {
+  const buf = audioCtx.createBuffer(1, length, rate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random()*2-1;
+  return buf;
+}
+function ensureAudioSystem() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  const rate = audioCtx.sampleRate, len = rate*2;
+  _noiseBuffer = generateWhiteNoise(len, rate);
+  _pinkBuffer = generatePinkNoise(len, rate);
+  filterNode = audioCtx.createBiquadFilter();
+  gainNode = audioCtx.createGain();
+  gainNode.gain.value = 0.06;
+  filterNode.connect(gainNode); gainNode.connect(audioCtx.destination);
+  applyPreset(PRESETS[_currentPreset]);
+}
+function applyPreset(p) {
+  filterNode.type = p.type; filterNode.frequency.value = p.freq;
+  filterNode.Q.value = p.Q; gainNode.gain.value = p.gain;
+}
+function getActiveBuffer() { return PRESETS[_currentPreset].pink ? _pinkBuffer : _noiseBuffer; }
+function rebuildNoiseNode() {
+  if (!audioCtx) return;
+  if (noiseNode) { try { noiseNode.stop(); } catch(_){} noiseNode.disconnect(); noiseNode=null; }
+  const src = audioCtx.createBufferSource();
+  src.buffer = getActiveBuffer(); src.loop = true;
+  src.connect(filterNode); src.start(0);
+  noiseNode = src;
+  applyPreset(PRESETS[_currentPreset]);
+}
+function stopNoise() { if(gainNode) gainNode.gain.value = 0; }
 function toggleSound() {
   const btn = document.getElementById('soundBtn');
-  if (isPlaying) {
-    gainNode.gain.value = 0;
-    btn.textContent = '🔇';
-    btn.classList.add('muted');
-    isPlaying = false;
-  } else {
-    if (!audioCtx) createRainAudio();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    noiseNode.start(0);
-    gainNode.gain.value = 0.08;
-    btn.textContent = '🔊';
-    btn.classList.remove('muted');
-    isPlaying = true;
+  if (isPlaying) { stopNoise(); btn.textContent='🔇'; btn.classList.add('muted'); }
+  else {
+    ensureAudioSystem(); if(audioCtx.state==='suspended') audioCtx.resume();
+    rebuildNoiseNode(); btn.textContent='🔊'; btn.classList.remove('muted');
   }
+  isPlaying = !isPlaying;
 }
-
-document.addEventListener('click', () => {
-  if (!audioCtx && !isPlaying) toggleSound();
-}, { once: true });
+function changePreset(val) {
+  _currentPreset = parseInt(val);
+  if (!audioCtx) return;
+  applyPreset(PRESETS[_currentPreset]);
+  if (isPlaying) rebuildNoiseNode();
+}
+function firstInteraction() {
+  document.removeEventListener('click', firstInteraction);
+  document.removeEventListener('touchstart', firstInteraction);
+  if (!isPlaying) toggleSound();
+}
+document.addEventListener('click', firstInteraction);
+document.addEventListener('touchstart', firstInteraction);
 
 // ─── Rain animation ───
 function draw() {
