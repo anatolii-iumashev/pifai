@@ -45,18 +45,15 @@ jobs:
   # === Bot: build & deploy to Cloudflare Workers ===
   deploy-bot:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: bot
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "npm"
-          cache-dependency-path: bot/package-lock.json
       - run: npm ci
+        working-directory: bot
       - run: npm run build
+        working-directory: bot
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
