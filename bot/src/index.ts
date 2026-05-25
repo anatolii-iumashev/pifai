@@ -133,7 +133,7 @@ function r(){W=c.width=innerWidth;H=c.height=innerHeight}r();
 addEventListener('resize',r);
 const D=Math.min(250,Math.floor(W*H/4000));
 const dr=Array.from({length:D},()=>({x:Math.random()*W,y:Math.random()*-H,speed:3+Math.random()*8,len:12+Math.random()*24,op:.15+Math.random()*.35,w:.5+Math.random()*1.2}));
-function d(){x.clearRect(0,0,W,H);for(const p of dr){p.y+=p.speed;if(p.y-p.len>H){p.y=-p.len-100*Math.random();p.x=Math.random()*W}x.beginPath();x.moveTo(p.x,p.y);x.lineTo(p.x-p.speed*.35,p.y-p.len);x.strokeStyle=`rgba(200,210,240,${p.op})`;x.lineWidth=p.w;x.lineCap='round';x.stroke()}requestAnimationFrame(d)}
+function d(){x.clearRect(0,0,W,H);for(const p of dr){p.y+=p.speed;if(p.y-p.len>H){p.y=-p.len-100*Math.random();p.x=Math.random()*W}x.beginPath();x.moveTo(p.x,p.y);x.lineTo(p.x-p.speed*.35,p.y-p.len);x.strokeStyle='rgba(200,210,240,'+p.op+')';x.lineWidth=p.w;x.lineCap='round';x.stroke()}requestAnimationFrame(d)}
 d();
 </script>
 </body>
