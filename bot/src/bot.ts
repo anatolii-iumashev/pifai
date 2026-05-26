@@ -5,6 +5,7 @@
 import { Telegraf } from 'telegraf';
 import type { LLMClient } from './llm';
 import type { SessionStore } from './session';
+import type { Retriever } from './retriever';
 import { HELP_TEXT, START_TEXT, CRISIS_RESPONSE } from './prompts';
 
 export interface BotConfig {
@@ -12,6 +13,7 @@ export interface BotConfig {
   llm: LLMClient;
   sessions: SessionStore;
   systemPrompt: string;
+  retriever: Retriever;
 }
 
 export function createBot(config: BotConfig) {
@@ -46,12 +48,26 @@ export function createBot(config: BotConfig) {
       // Получаем историю
       const history = await config.sessions.get(userId);
 
+      // Ищем релевантные статьи из базы знаний
+      const relevant = config.retriever.retrieve(userMessage, 3);
+      const knowledgeContext = config.retriever.formatContext(relevant);
+
       // Собираем сообщения для LLM
       const messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }> = [
         { role: 'system', content: config.systemPrompt },
         ...history.map(m => ({ role: m.role, content: m.content })),
-        { role: 'user', content: userMessage },
       ];
+
+      // Добавляем контекст из базы знаний (если найдено)
+      if (knowledgeContext) {
+        messages.push({
+          role: 'user',
+          content: `Найденные статьи из базы знаний (используй их для ответа, цитируй источники):\n\n${knowledgeContext}\n\nТеперь ответь пользователю с учётом этой информации.`,
+        });
+      }
+
+      // Добавляем сообщение пользователя
+      messages.push({ role: 'user', content: userMessage });
 
       // Отправляем запрос к LLM
       const response = await config.llm.chat(messages);

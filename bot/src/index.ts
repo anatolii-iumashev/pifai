@@ -1,14 +1,16 @@
 import { createBot } from './bot';
 import { initLLM } from './llm';
 import { initSessionStore } from './session';
-import { KNOWLEDGE_BASE } from './knowledge';
+import { KNOWLEDGE_BASE, KNOWLEDGE_CHUNKS } from './knowledge';
 import { SYSTEM_PROMPT } from './prompts';
+import { createRetriever } from './retriever';
 
 export interface Env {
   TELEGRAM_BOT_TOKEN: string;
   GROQ_API_KEY: string;
   GROQ_MODEL?: string;
   KNOWLEDGE_VERSION?: string;
+  KNOWLEDGE_BASE_URL?: string;
   SESSIONS: KVNamespace;
 }
 
@@ -44,16 +46,18 @@ export default {
           }
           const llm = initLLM({ apiKey: env.GROQ_API_KEY, model: env.GROQ_MODEL || 'llama-3.1-8b-instant' });
           const sessions = initSessionStore(env);
+          const retriever = createRetriever(KNOWLEDGE_CHUNKS, env.KNOWLEDGE_BASE_URL);
           botInstance = createBot({
             token: env.TELEGRAM_BOT_TOKEN,
             llm,
             sessions,
             systemPrompt: SYSTEM_PROMPT(KNOWLEDGE_BASE),
+            retriever,
           });
         }
 
         // Parse update body
-        const update = await request.json();
+        const update = await request.json() as any;
         await botInstance.handleUpdate(update);
         return new Response('ok', { status: 200 });
       } catch (error) {
