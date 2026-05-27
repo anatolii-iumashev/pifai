@@ -131,18 +131,25 @@ Telegram-бот на стеке **Node.js + Cloudflare Workers + Groq (Llama-3.3
 bot/
 ├── src/
 │   ├── index.ts           # Cloudflare Workers entry (webhook + health)
-│   ├── bot.ts             # Обработчики Telegram
-│   ├── knowledge.ts       # База знаний (конденсированная для TPM-лимитов)
-│   ├── llm.ts             # Клиент Groq (raw fetch, CF Workers compatible)
+│   ├── bot.ts             # Обработчики Telegram + RAG-обогащение контекста
+│   ├── knowledge.ts       # База знаний + индекс чанков для RAG-поиска (авто-генерация)
+│   ├── retriever.ts       # RAG-поиск по wiki: поиск релевантных статей + цитирование
+│   ├── llm.ts             # Клиент Groq API (CF Workers compatible)
 │   ├── session.ts         # История чатов (Cloudflare KV)
 │   ├── prompts.ts         # System prompt + шаблоны
 │   └── utils.ts           # Вспомогательные функции
 ├── scripts/
-│   └── build-knowledge.ts # Скрипт сборки знаний из src/content/docs/
+│   └── build-knowledge.ts # Скрипт сборки знаний из src/content/docs/ + генерация чанков
 ├── wrangler.toml          # Cloudflare Workers конфиг
 ├── package.json
 └── .dev.vars              # Локальные переменные (не коммитить)
 ```
+
+### Ключевые особенности
+
+- **RAG-архитектура**: на каждый запрос пользователя бот ищет релевантные статьи из wiki, добавляет их в контекст LLM и цитирует источники
+- **Цитирование**: ответы содержат ссылки на конкретные страницы базы знаний (`https://anatolii-iumashev.github.io/pifai/...`)
+- **Настраиваемый URL базы знаний**: домен задаётся через переменную `KNOWLEDGE_BASE_URL`
 
 ### Быстрый старт
 

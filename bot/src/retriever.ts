@@ -45,8 +45,13 @@ export interface Retriever {
  *   "basics/emotions-and-needs.md" → "/basics/emotions-and-needs/"
  */
 function wikiPathToUrl(sourcePath: string): string {
-  // Убираем .md, превращаем в directory-style URL
-  return '/' + sourcePath.replace(/\.md$/, '') + '/';
+  // Убираем .md
+  const withoutExt = sourcePath.replace(/\.md$/, '');
+  // Если это index.md — URL на родительскую директорию
+  if (withoutExt.endsWith('/index')) {
+    return '/' + withoutExt.replace('/index', '') + '/';
+  }
+  return '/' + withoutExt + '/';
 }
 
 // Стоп-слова (русские + английские)

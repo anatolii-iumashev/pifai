@@ -1,7 +1,7 @@
 import { createBot } from './bot';
 import { initLLM } from './llm';
 import { initSessionStore } from './session';
-import { KNOWLEDGE_BASE, KNOWLEDGE_CHUNKS } from './knowledge';
+import { KNOWLEDGE_CHUNKS } from './knowledge';
 import { SYSTEM_PROMPT } from './prompts';
 import { createRetriever } from './retriever';
 
@@ -51,7 +51,7 @@ export default {
             token: env.TELEGRAM_BOT_TOKEN,
             llm,
             sessions,
-            systemPrompt: SYSTEM_PROMPT(KNOWLEDGE_BASE),
+            systemPrompt: SYSTEM_PROMPT(),
             retriever,
           });
         }

@@ -49,7 +49,7 @@ export function createBot(config: BotConfig) {
       const history = await config.sessions.get(userId);
 
       // Ищем релевантные статьи из базы знаний
-      const relevant = config.retriever.retrieve(userMessage, 3);
+      const relevant = config.retriever.retrieve(userMessage, 2);
       const knowledgeContext = config.retriever.formatContext(relevant);
 
       // Собираем сообщения для LLM
@@ -58,16 +58,11 @@ export function createBot(config: BotConfig) {
         ...history.map(m => ({ role: m.role, content: m.content })),
       ];
 
-      // Добавляем контекст из базы знаний (если найдено)
-      if (knowledgeContext) {
-        messages.push({
-          role: 'user',
-          content: `Найденные статьи из базы знаний (используй их для ответа, цитируй источники):\n\n${knowledgeContext}\n\nТеперь ответь пользователю с учётом этой информации.`,
-        });
-      }
-
-      // Добавляем сообщение пользователя
-      messages.push({ role: 'user', content: userMessage });
+      // Добавляем вопрос с контекстом (одним сообщением)
+      const userContent = knowledgeContext
+        ? `Найденные статьи (цитируй их):\n\n${knowledgeContext}\n\nВопрос пользователя: ${userMessage}`
+        : userMessage;
+      messages.push({ role: 'user', content: userContent });
 
       // Отправляем запрос к LLM
       const response = await config.llm.chat(messages);
@@ -86,9 +81,19 @@ export function createBot(config: BotConfig) {
 
       // Отправляем ответ
       await ctx.reply(response, { parse_mode: 'Markdown' });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Bot error:', error);
-      await ctx.reply('Произошла ошибка. Пожалуйста, попробуй ещё раз позже.');
+
+      // Проверяем, не ошибка ли это "Request too large" (история накопилась)
+      const errMsg = error?.message || error?.toString() || '';
+      if (errMsg.includes('Request too large') || errMsg.includes('rate_limit_exceeded')) {
+        await ctx.reply(
+          '💬 Похоже, история нашего диалога стала слишком большой для обработки. ' +
+          'Напиши /clear, чтобы очистить историю, и я смогу ответить на твой вопрос.'
+        );
+      } else {
+        await ctx.reply('Произошла ошибка. Пожалуйста, попробуй ещё раз позже.');
+      }
     }
   });
 
