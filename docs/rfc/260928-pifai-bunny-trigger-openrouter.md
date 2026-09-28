@@ -6,6 +6,8 @@ created: 2026-09-28
 
 # RFC: Перенос Telegram-бота ПиФ с Cloudflare на Bunny и Trigger.dev
 
+- [ ] Hop faster, build smarter with Deno. Powered by Deno, Bunny Edge Scripting makes the edge your playground.
+
 ## Вводные
 
 Сайт и база знаний **остаются на GitHub Pages** по прежнему адресу. Меняется только серверная цепочка Telegram: Bunny Edge Script принимает webhook, Trigger.dev выполняет консультацию, OpenRouter предоставляет модель, Postgres хранит ограниченную историю. Старый Cloudflare Worker остаётся доступным для отката до завершения наблюдения. Сборка и публикация Astro/Starlight в `.github/workflows/deploy.yml` не меняют площадку.
@@ -22,13 +24,13 @@ created: 2026-09-28
 
 ## Проверенное исходное состояние
 
-| Область | До миграции | Целевая версия |
-| --- | --- | --- |
-| Сайт | Astro/Starlight на GitHub Pages (`/pifai`) | Без изменений |
-| Webhook | `bot/src/index.ts` в Cloudflare Worker, синхронный LLM-вызов, нет проверки секретного заголовка | `includes/edge/src/handler.ts` в standalone Bunny Edge Script |
-| Консультация | `bot/src/bot.ts`, Groq, поиск по старому `knowledge.ts` | `includes/consult/src/trigger/consult-telegram.ts`, OpenRouter, свежая сборка wiki |
-| История | Cloudflare KV по userId, 20 сообщений / 7 дней | Postgres по chatId, 20 сообщений / 7 дней |
-| Публикация бота | Cloudflare job на каждом push | Отдельный проверяемый и вручную запускаемый `bot-v2.yml` |
+| Область         | До миграции                                                                                              | Целевая версия                                                                     |
+| --------------- | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Сайт            | Astro/Starlight на GitHub Pages (`/pifai`)                                                               | Без изменений                                                                      |
+| Webhook         | `includes/bot/src/index.ts` в Cloudflare Worker, синхронный LLM-вызов, нет проверки секретного заголовка | `includes/edge/src/handler.ts` в standalone Bunny Edge Script                      |
+| Консультация    | `includes/bot/src/bot.ts`, Groq, поиск по старому `knowledge.ts`                                         | `includes/consult/src/trigger/consult-telegram.ts`, OpenRouter, свежая сборка wiki |
+| История         | Cloudflare KV по userId, 20 сообщений / 7 дней                                                           | Postgres по chatId, 20 сообщений / 7 дней                                          |
+| Публикация бота | Cloudflare job на каждом push                                                                            | Отдельный проверяемый и вручную запускаемый `bot-v2.yml`                           |
 
 ## Составляющие и контракты
 

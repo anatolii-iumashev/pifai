@@ -139,7 +139,8 @@ includes/consult/             # Trigger.dev задача, OpenRouter, Postgres, 
   ├── scripts/build-knowledge.mjs
   ├── src/trigger/consult-telegram.ts
   └── eval/questions.json
-bot/                          # Прежний Cloudflare Worker для отката
+includes/bot/                 # Прежний Cloudflare Worker для отката
+includes/landing/             # Отдельная посадочная страница
 ```
 
 ### Ключевые особенности

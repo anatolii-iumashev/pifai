@@ -1,7 +1,7 @@
 /**
  * build-knowledge.ts — Скрипт сборки базы знаний
  *
- * Собирает все .md файлы из ../src/content/docs/ в единую KB_STRING
+ * Собирает все .md файлы из src/content/docs/ в единую KB_STRING
  * и генерирует src/knowledge.ts с актуальным содержимым.
  *
  * Запуск: bun run scripts/build-knowledge.ts
@@ -12,7 +12,7 @@ import { join, relative, resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DOCS_DIR = resolve(__dirname, '../../src/content/docs');
+const DOCS_DIR = resolve(__dirname, '../../../src/content/docs');
 const OUTPUT_FILE = resolve(__dirname, '../src/knowledge.ts');
 
 interface WikiPage {

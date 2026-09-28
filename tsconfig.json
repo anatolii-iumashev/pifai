@@ -6,6 +6,6 @@
   ],
   "exclude": [
     "dist",
-    "bot"
+    "includes"
   ]
 }

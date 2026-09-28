@@ -6,6 +6,8 @@ npm-debug.log
 dist
 .astro
 .bunny/
+.wrangler/
+.trigger/
 includes/consult/generated/
 
 # Logs
