@@ -1,0 +1,65 @@
+name: Bot v2
+
+on:
+  push:
+    paths:
+      - "includes/edge/**"
+      - "includes/consult/**"
+      - "src/content/docs/**"
+      - "src/content/quotes/**"
+      - ".github/workflows/bot-v2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            includes/edge/package-lock.json
+            includes/consult/package-lock.json
+      - run: npm ci
+        working-directory: includes/edge
+      - run: npm run check && npm test && npm run build
+        working-directory: includes/edge
+      - run: npm ci
+        working-directory: includes/consult
+      - run: npm run check && npm test
+        working-directory: includes/consult
+
+  deploy:
+    if: github.event_name == 'workflow_dispatch'
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            includes/edge/package-lock.json
+            includes/consult/package-lock.json
+      - run: npm ci
+        working-directory: includes/consult
+      - name: Deploy consultation task
+        run: npm run deploy -- --external-id ${{ github.sha }}
+        working-directory: includes/consult
+        env:
+          TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+          TRIGGER_PROJECT_REF: ${{ vars.TRIGGER_PROJECT_REF }}
+      - run: npm ci && npm run build
+        working-directory: includes/edge
+      - name: Deploy Bunny webhook
+        run: npx @bunny.net/cli scripts deploy dist/index.js "$BUNNY_EDGE_SCRIPT_ID"
+        working-directory: includes/edge
+        env:
+          BUNNYNET_API_KEY: ${{ secrets.BUNNYNET_API_KEY }}
+          BUNNY_EDGE_SCRIPT_ID: ${{ vars.BUNNY_EDGE_SCRIPT_ID }}

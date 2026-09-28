@@ -5,6 +5,8 @@ npm-debug.log
 # Build output
 dist
 .astro
+.bunny/
+includes/consult/generated/
 
 # Logs
 logs

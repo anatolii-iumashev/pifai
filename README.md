@@ -128,33 +128,26 @@ pl-chat/
 ---
 ## 🤖 Чат-бот (Telegram)
 
-Telegram-бот на стеке **Node.js + Cloudflare Workers + Groq (Llama-3.3-70B)** с базой знаний из вики.
+Сайт и база знаний публикуются на GitHub Pages. Новая версия Telegram-бота построена на **Bunny Edge Scripting → Trigger.dev → OpenRouter**; продовый webhook пока остаётся на старом Cloudflare Worker до проверки новой цепочки.
 
 ### Архитектура
 
 ```
-bot/
-├── src/
-│   ├── index.ts           # Cloudflare Workers entry (webhook + health)
-│   ├── bot.ts             # Обработчики Telegram + RAG-обогащение контекста
-│   ├── knowledge.ts       # База знаний + индекс чанков для RAG-поиска (авто-генерация)
-│   ├── retriever.ts       # RAG-поиск по wiki: поиск релевантных статей + цитирование
-│   ├── llm.ts             # Клиент Groq API (CF Workers compatible)
-│   ├── session.ts         # История чатов (Cloudflare KV)
-│   ├── prompts.ts         # System prompt + шаблоны
-│   └── utils.ts           # Вспомогательные функции
-├── scripts/
-│   └── build-knowledge.ts # Скрипт сборки знаний из src/content/docs/ + генерация чанков
-├── wrangler.toml          # Cloudflare Workers конфиг
-├── package.json
-└── .dev.vars              # Локальные переменные (не коммитить)
+includes/edge/                # Bunny standalone Edge Script: Telegram webhook
+includes/consult/             # Trigger.dev задача, OpenRouter, Postgres, поиск по wiki
+  ├── migrations/001_dialogues.sql
+  ├── scripts/build-knowledge.mjs
+  ├── src/trigger/consult-telegram.ts
+  └── eval/questions.json
+bot/                          # Прежний Cloudflare Worker для отката
 ```
 
 ### Ключевые особенности
 
-- **RAG-архитектура**: на каждый запрос пользователя бот ищет релевантные статьи из wiki, добавляет их в контекст LLM и цитирует источники
-- **Цитирование**: ответы содержат ссылки на конкретные страницы базы знаний (`https://anatolii-iumashev.github.io/pifai/...`)
-- **Настраиваемый URL базы знаний**: домен задаётся через переменную `KNOWLEDGE_BASE_URL`
+- **Webhook**: Bunny проверяет секрет Telegram и ставит задачу в Trigger.dev; консультация не выполняется на границе.
+- **Знания**: при деплое Trigger.dev собирается индекс из wiki и YAML-цитат. Ссылки ведут на прежний GitHub Pages URL (`https://anatolii-iumashev.github.io/pifai/...`).
+- **История**: Postgres хранит 20 последних сообщений чата не дольше семи дней; при неопределённой доставке повторная отправка блокируется.
+- **Проверка и развёртывание**: [RFC миграции](docs/rfc/260928-pifai-bunny-trigger-openrouter.md) содержит команды тестов, окружения и порядок переключения webhook.
 
 ### Быстрый старт
 
