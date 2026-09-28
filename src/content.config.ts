@@ -14,7 +14,7 @@ const quote = z.object({
   source: z.object({
     work: z.string().optional(),
     via: z.string().optional(),
-    url: z.string().url().optional(),
+    url: z.url().optional(),
   }).optional(),
 });
 

@@ -34,13 +34,13 @@ Compile a new source into the persistent wiki. **База знаний сфок�
 - 3-5 main points.
 - What to emphasize/de-emphasize.
 - Potential contradictions with existing pages.
-3. **Цитаты:** источник истины — `src/content/quotes/<author>.yaml`, один файл на автора. Найди его по таблице нормализации или `name`, проверь текст на совпадение. Для существующей цитаты добавь тему в `topics`; для новой допиши запись в конец `quotes`. Значения `topics` должны входить в `QUOTE_TOPICS` из `src/lib/quote-topics.ts`. Не копируй текст цитаты на MDX-страницу темы: там используется `<QuoteList topic="…" />`.
-4. Create or update relevant pages in the correct category folder.
-5. Add or update cross-references in both directions.
-6. Update `src/content/docs/index.md` entries.
-7. Append `src/content/docs/log.md`:
+4. **Цитаты:** источник истины — `src/content/quotes/<author>.yaml`, один файл на автора. Найди его по таблице нормализации или `name`, проверь текст на совпадение. Для существующей цитаты добавь тему в `topics`; для новой допиши запись в конец `quotes`. Значения `topics` должны входить в `QUOTE_TOPICS` из `src/lib/quote-topics.ts`. Не копируй текст цитаты на MDX-страницу темы: там используется `<QuoteList topic="…" />`.
+5. Create or update relevant pages in the correct category folder.
+6. Add or update cross-references in both directions.
+7. Update `src/content/docs/index.md` entries.
+8. Append `src/content/docs/log.md`:
    - `## [YYYY-MM-DD] ingest | <source title>`
-8. Report all touched files.
+9. Report all touched files.
 
 ## Placement Heuristic
 
