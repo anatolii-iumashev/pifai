@@ -1,0 +1,28 @@
+---
+import { getQuotes } from '../../lib/quotes';
+import type { QuoteTopic } from '../../lib/quote-topics';
+
+interface Props {
+  topic?: QuoteTopic;
+  author?: string;
+}
+
+const { topic, author } = Astro.props;
+const quotes = await getQuotes({ topic, author });
+---
+{quotes.map((quote) => (
+  <section id={quote.id.replace('/', '-')}>
+    <h2>{quote.author.name}</h2>
+    <blockquote>«{quote.text}»</blockquote>
+    {quote.context && <p><strong>Контекст:</strong> {quote.context}</p>}
+    {quote.reflection && <p><strong>Для размышления:</strong> {quote.reflection}</p>}
+    {(quote.source?.work || quote.source?.via) && (
+      <p class="quote-source">
+        Источник: {quote.source.url
+          ? <a href={quote.source.url}>{quote.source.work ?? quote.source.via}</a>
+          : quote.source.work ?? quote.source.via}
+      </p>
+    )}
+    <hr />
+  </section>
+))}

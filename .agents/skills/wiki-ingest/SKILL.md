@@ -34,12 +34,13 @@ Compile a new source into the persistent wiki. **База знаний сфок�
 - 3-5 main points.
 - What to emphasize/de-emphasize.
 - Potential contradictions with existing pages.
-3. Create or update relevant pages in the correct category folder.
-4. Add or update cross-references in both directions.
-5. Update `src/content/docs/index.md` entries.
-6. Append `src/content/docs/log.md`:
+3. **Цитаты:** источник истины — `src/content/quotes/<author>.yaml`, один файл на автора. Найди его по таблице нормализации или `name`, проверь текст на совпадение. Для существующей цитаты добавь тему в `topics`; для новой допиши запись в конец `quotes`. Значения `topics` должны входить в `QUOTE_TOPICS` из `src/lib/quote-topics.ts`. Не копируй текст цитаты на MDX-страницу темы: там используется `<QuoteList topic="…" />`.
+4. Create or update relevant pages in the correct category folder.
+5. Add or update cross-references in both directions.
+6. Update `src/content/docs/index.md` entries.
+7. Append `src/content/docs/log.md`:
    - `## [YYYY-MM-DD] ingest | <source title>`
-7. Report all touched files.
+8. Report all touched files.
 
 ## Placement Heuristic
 
@@ -60,7 +61,7 @@ If none fit, propose a new category before creating it.
 - Every new page has frontmatter (`title`, `description`).
 - Do NOT start pages with an `# H1` heading; Starlight renders frontmatter `title` as H1. Start content from `##`.
 - **«Материалы и источники» обязательны:** каждая страница заканчивается ссылкой на оригинальный URL. Внешние ссылки автоматически получают `target="_blank"` при сборке — в исходниках пиши обычный markdown: `[текст](https://...)`.
-- **Ссылки всегда с `.md`:** все относительные ссылки на wiki-страницы пиши с расширением `.md` (напр. `[text](./page.md)`). Для index-файлов: `./category/index.md`. НИКОГДА не пиши без `.md` или с `/` в конце. Плагин `remarkStripMdLinks` сам уберёт расширения при сборке.
+- **Ссылки всегда с расширением исходного файла (`.md` или `.mdx`):** все относительные ссылки на wiki-страницы пиши с расширением исходника (напр. `[text](./page.md)` или `[text](./page.mdx)`). Для index-файлов: `./category/index.md`. НИКОГДА не пиши без расширения исходного файла или с `/` в конце. Плагин `remarkStripMdLinks` сам уберёт расширения при сборке.
 - Backlink pass is mandatory.
 
 ## Done Criteria

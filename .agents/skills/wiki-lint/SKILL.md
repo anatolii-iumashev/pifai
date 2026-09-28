@@ -15,6 +15,13 @@ Scan under `src/content/docs/`, excluding:
 
 ## Checks
 
+В дополнение к Markdown-страницам проверь коллекцию цитат в `src/content/quotes/*.yaml` и `src/lib/quote-topics.ts`:
+- одинаковые `name` или `fullName` в разных YAML-файлах;
+- повторяющийся текст цитаты внутри файла и между авторами;
+- каждый topic входит в `QUOTE_TOPICS` и имеет страницу `src/content/docs/quotes/<topic>.mdx`;
+- каждый slug из `QUOTE_TOPICS` имеет такую страницу.
+Схему Astro проверяй командой `npm run check`.
+
 Priority order:
 1. Errors:
 - Broken relative links.

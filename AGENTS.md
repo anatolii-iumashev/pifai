@@ -14,6 +14,8 @@ pl-chat/
 │   └── YYYY/                  # Year (e.g. 2026)
 │       └── MMDD/              # Month + Day (e.g. 0501 = May 1)
 │           └── file.{md,pdf}  # Source files
+├── src/content/quotes/       # Quote data: one YAML file per author
+│   └── <author>.yaml
 ├── src/content/docs/          # ★ WIKI PAGES — you write and maintain these
 │   ├── basics/                # 1. База и вводные — с чего начать
 │   ├── use-cases/             # 2. Проблематика и Use cases
@@ -105,7 +107,7 @@ When asked to ingest a source:
    - Базовая теория, вводные → `basics/`
    - Проблемы, запросы, use cases → `use-cases/`
    - Техники и упражнения → `practices/`
-   - Вдохновляющие цитаты → `quotes/`
+   - Вдохновляющие цитаты → данные в `src/content/quotes/<author>.yaml`; тематические страницы — `quotes/<topic>.mdx`
    - ННО / NVC concepts → `authors/rosenberg/`
    - Юнгианская психология → `authors/jung/`
    - Логотерапия Франкла → `authors/frankl/`
@@ -119,10 +121,11 @@ When asked to ingest a source:
    - Сохранённые ответы → `addons/queries/`
    - If a new category is needed → propose it to the user
    - **Every page must include «Материалы и источники»** at the bottom
-5. **Update `src/content/docs/index.md`** — add entry with relative link + one-line summary
-6. **Append to `src/content/docs/log.md`**: `## [YYYY-MM-DD] ingest | Title`
-7. **Add cross-references** in related existing pages (links back to the new page)
-8. **Report**: list all files created/modified
+5. Для цитаты найди файл автора по таблице нормализации или полю `name`; проверь совпадение текста, если цитата уже есть — добавь тему в `topics`, иначе добавь новую запись в конец массива `quotes`. Темы бери только из `QUOTE_TOPICS` в `src/lib/quote-topics.ts`. Не копируй текст цитаты на тематическую страницу.
+6. **Update `src/content/docs/index.md`** — add entry with relative link + one-line summary
+7. **Append to `src/content/docs/log.md`**: `## [YYYY-MM-DD] ingest | Title`
+8. **Add cross-references** in related existing pages (links back to the new page)
+9. **Report**: list all files created/modified
 
 A single source typically touches 5-15 wiki pages. Don't be lazy — update everything relevant.
 
@@ -203,7 +206,7 @@ All wiki skills must enforce:
 
 ## General Rules
 
-- **Ссылки в исходниках — всегда с `.md`:** все относительные ссылки на wiki-страницы (`[text](./path/page.md)`) пишутся с расширением `.md`. Для index-файлов каталогов — `./category/index.md`. Это нужно для работы ссылок в VS Code и GitHub. НИКОГДА не пиши ссылки без `.md`, НИКОГДА не пиши ссылки с `/` в конце вместо `.md`.
+- **Ссылки в исходниках — всегда с расширением исходного файла (`.md` или `.mdx`):** все относительные ссылки на wiki-страницы (`[text](./path/page.md)`) пишутся с расширением исходного файла — `.md` или `.mdx`. Для index-файлов каталогов — `./category/index.md`. Это нужно для работы ссылок в VS Code и GitHub. НИКОГДА не пиши ссылки без `.md`, НИКОГДА не пиши ссылки с `/` в конце вместо `.md`.
 - **Focus:** База знаний про **ННО (Маршал Розенберг), Юнгианскую психологию, MBTI, логотерапию (Франкл), интегральную теорию (Уилбер), процессуальную психологию (Минделл), методологию Адизеса, психологическое айкидо (Литвак), практические техники**.
 - **Language**: All wiki content in Russian (ru-RU)
 - **Tone**: Эмпатичный, точный, без воды, с уважением к теме

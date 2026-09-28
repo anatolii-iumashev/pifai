@@ -28,13 +28,18 @@ description: "База знаний чат-бота ПиФ: ННО, юнгиан
   - [Техника амортизации в конфликте](./practices/amortization-exercise.md)
 
 ## 4. Цитаты великих людей
-  - [Лев Толстой](./quotes/tolstoy.md) — из «Круга Чтения» и «Пути Жизни»
-  - [Карл Юнг](./quotes/jung.md) — о самопознании и Тени
-  - [Виктор Франкл](./quotes/frankl.md) — о смысле и страдании
-  - [Маршалл Розенберг](./quotes/rosenberg.md) — об эмпатии и потребностях
-  - [Другие мыслители](./quotes/others.md) — Фрейд, Эпиктет, Марк Аврелий, Будда и др.
 
-- [Цитаты](./quotes/index.md) — вдохновение и мотивация
+- [Цитаты](./quotes/index.md) — 78 записей от 21 автора, сгруппированных по десяти темам
+  - [Самопознание и внутренняя работа](./quotes/self-knowledge.mdx)
+  - [Смерть и Жизнь](./quotes/memento-mori.mdx)
+  - [Свобода и рабство](./quotes/freedom-slavery.mdx)
+  - [Вера, душа и Бог](./quotes/faith-soul-god.mdx)
+  - [Добрые дела и служение](./quotes/good-deeds-service.mdx)
+  - [Судьба и принятие](./quotes/fate-acceptance.mdx)
+  - [Мысли и реальность](./quotes/thoughts-reality.mdx)
+  - [Мудрость и знание](./quotes/wisdom-knowledge.mdx)
+  - [Ненависть, гнев и прощение](./quotes/hatred-anger-forgiveness.mdx)
+  - [Детство, невинность и обновление](./quotes/childhood-innocence.mdx)
 
 ## 5. Авторы и школы
 

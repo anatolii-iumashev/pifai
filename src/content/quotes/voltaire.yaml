@@ -1,0 +1,10 @@
+name: Вольтер
+kind: person
+quotes:
+- text: Сомнение — начало мудрости.
+  topics:
+  - thoughts-reality
+  - wisdom-knowledge
+  context: Кто не сомневается, тот не мыслит. Сомнение открывает путь к истине.
+  reflection: В чём вы сомневаетесь? Или приняли всё на веру?
+fullName: Франсуа-Мари Аруэ

@@ -1,6 +1,6 @@
 ---
 title: "Цитаты как YAML content collection"
-status: draft # draft | discovery | delivery | done
+status: delivery # draft | discovery | delivery | done
 created: 2026-09-28
 ---
 

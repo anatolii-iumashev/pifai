@@ -89,12 +89,17 @@ pl-chat/
   - [Техника амортизации в конфликте](src/content/docs/practices/amortization-exercise.md)
   - [Дневник эмоций и потребностей](src/content/docs/practices/emotional-diary.md)
   - [Техника заземления 5-4-3-2-1](src/content/docs/practices/grounding-5-4-3-2-1.md)
-- **[4. Цитаты великих людей](src/content/docs/quotes/index.md)** — вдохновение и мотивация
-  - [Лев Толстой](src/content/docs/quotes/tolstoy.md) — из «Круга Чтения» и «Пути Жизни»
-  - [Карл Юнг](src/content/docs/quotes/jung.md) — о самопознании и Тени
-  - [Виктор Франкл](src/content/docs/quotes/frankl.md) — о смысле и страдании
-  - [Маршалл Розенберг](src/content/docs/quotes/rosenberg.md) — об эмпатии и потребностях
-  - [Другие мыслители](src/content/docs/quotes/others.md) — Фрейд, Эпиктет, Марк Аврелий, Будда и др.
+- **[4. Цитаты великих людей](src/content/docs/quotes/index.md)** — 78 записей от 21 автора по десяти темам
+  - [Самопознание и внутренняя работа](src/content/docs/quotes/self-knowledge.mdx)
+  - [Смерть и Жизнь](src/content/docs/quotes/memento-mori.mdx)
+  - [Свобода и рабство](src/content/docs/quotes/freedom-slavery.mdx)
+  - [Вера, душа и Бог](src/content/docs/quotes/faith-soul-god.mdx)
+  - [Добрые дела и служение](src/content/docs/quotes/good-deeds-service.mdx)
+  - [Судьба и принятие](src/content/docs/quotes/fate-acceptance.mdx)
+  - [Мысли и реальность](src/content/docs/quotes/thoughts-reality.mdx)
+  - [Мудрость и знание](src/content/docs/quotes/wisdom-knowledge.mdx)
+  - [Ненависть, гнев и прощение](src/content/docs/quotes/hatred-anger-forgiveness.mdx)
+  - [Детство, невинность и обновление](src/content/docs/quotes/childhood-innocence.mdx)
 - **[5. Авторы и школы](src/content/docs/authors/index.md)** — ключевые идеи авторов и подходов
   - [ННО — Розенберг](src/content/docs/authors/rosenberg/index.md)
     - [4 компонента ННО](src/content/docs/authors/rosenberg/4-components.md)
