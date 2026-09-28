@@ -1,0 +1,5 @@
+{
+  "minRecallAt3": 0.8,
+  "hybridGainPercentagePoints": 5,
+  "outsideBm25ScoreThreshold": 1.5
+}

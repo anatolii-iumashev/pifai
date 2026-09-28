@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { Document } from '@langchain/core/documents';
 import { BaseRetriever } from '@langchain/core/retrievers';
 import { tool } from '@langchain/core/tools';
@@ -58,8 +57,9 @@ function fileAt(source: string, file: string): string {
   return `${source.replace(/\/$/, '')}/${file}`;
 }
 
-function verifyHash(bytes: Uint8Array, declared: string | undefined, filename: string): void {
-  const actual = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+async function verifyHash(bytes: Uint8Array, declared: string | undefined, filename: string): Promise<void> {
+  const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes as BufferSource));
+  const actual = `sha256:${[...digest].map((byte) => byte.toString(16).padStart(2, '0')).join('')}`;
   if (!declared || actual !== declared) throw new Error(`RAG ${filename}: hash mismatch`);
 }
 
@@ -133,21 +133,21 @@ export async function loadRagIndex(source: string, reader: ArtifactReader = defa
     const manifest = JSON.parse(new TextDecoder().decode(await reader(fileAt(source, 'manifest.json')))) as RagManifest;
     if (manifest.schemaVersion !== 1) throw new Error(`Unsupported RAG schemaVersion ${manifest.schemaVersion}`);
     if (!manifest.buildId || !manifest.chunkCount) throw new Error('Invalid RAG manifest');
-    const existing = buildCache.get(manifest.buildId);
-    if (existing) return existing;
     const chunksBytes = await reader(fileAt(source, 'chunks.json'));
-    verifyHash(chunksBytes, manifest.files['chunks.json'], 'chunks.json');
+    await verifyHash(chunksBytes, manifest.files['chunks.json'], 'chunks.json');
     const chunks = JSON.parse(new TextDecoder().decode(chunksBytes)) as RagChunk[];
     if (chunks.length !== manifest.chunkCount || new Set(chunks.map((chunk) => chunk.id)).size !== chunks.length) throw new Error('RAG chunk count or ID mismatch');
     let vectors: Float32Array | undefined;
     if (manifest.embedding) {
       const bytes = await reader(fileAt(source, 'embeddings.bin'));
-      verifyHash(bytes, manifest.files['embeddings.bin'], 'embeddings.bin');
+      await verifyHash(bytes, manifest.files['embeddings.bin'], 'embeddings.bin');
       if (bytes.byteLength !== chunks.length * manifest.embedding.dim * 4) throw new Error('RAG embedding dimensions mismatch');
       const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
       vectors = new Float32Array(chunks.length * manifest.embedding.dim);
       for (let i = 0; i < vectors.length; i++) vectors[i] = view.getFloat32(i * 4, true);
     }
+    const existing = buildCache.get(manifest.buildId);
+    if (existing && existing.manifest.files['chunks.json'] === manifest.files['chunks.json'] && existing.manifest.files['embeddings.bin'] === manifest.files['embeddings.bin']) return existing;
     const index = new RagIndex(manifest, chunks, vectors);
     buildCache.set(manifest.buildId, index);
     return index;
@@ -201,10 +201,12 @@ export function createKnowledgeTool(index: RagIndex, options: Omit<SearchOptions
     const result: Record<string, unknown>[] = [];
     for (const chunk of found) {
       const item = { sourceId: chunk.id, title: chunk.title, section: chunk.section, url: chunk.url, kind: chunk.kind, ...(chunk.metadata.author ? { author: chunk.metadata.author } : {}), text: chunk.text };
-      let remaining = budget - JSON.stringify(result).length;
-      if (remaining < 120) break;
-      if (JSON.stringify(item).length > remaining) item.text = chunk.text.slice(0, Math.max(0, remaining - 180));
-      if (item.text) result.push(item);
+      const emptyLength = JSON.stringify([...result, { ...item, text: '' }]).length;
+      if (emptyLength + 1 > budget) break;
+      item.text = chunk.text.slice(0, budget - emptyLength);
+      while (item.text && JSON.stringify([...result, item]).length > budget) item.text = item.text.slice(0, -1);
+      if (!item.text) break;
+      result.push(item);
     }
     return JSON.stringify(result);
   }, {
