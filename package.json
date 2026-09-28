@@ -8,7 +8,7 @@
     "build": "node scripts/build.mjs",
     "preview": "NODE_ENV=production astro preview",
     "check": "astro check",
-    "test:rag": "npm run build && node --import tsx --test test/rag.test.ts"
+    "test:rag": "npm run build && node --import tsx --test test/*.test.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.8",
