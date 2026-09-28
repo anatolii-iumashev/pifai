@@ -1,6 +1,5 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import { handleRequest } from '../src/handler.js';
+import { assertEquals } from '@std/assert';
+import { handleRequest } from '../src/handler.ts';
 
 const config = { webhookSecret: 'telegram-secret', triggerSecretKey: 'trigger-secret' };
 const update = { update_id: 123, message: { message_id: 8, chat: { id: 42, type: 'private' }, from: { id: 42 }, text: 'Как справиться с тревогой?' } };
@@ -10,47 +9,47 @@ const request = (body: unknown, headers: Record<string, string> = {}) => new Req
   body: JSON.stringify(body),
 });
 
-test('rejects unauthenticated updates before enqueue', async () => {
+Deno.test('rejects unauthenticated updates before enqueue', async () => {
   let calls = 0;
-  const response = await handleRequest(request(update, { 'X-Telegram-Bot-Api-Secret-Token': 'wrong' }), config, async () => {
+  const response = await handleRequest(request(update, { 'X-Telegram-Bot-Api-Secret-Token': 'wrong' }), config, () => {
     calls++;
-    return Response.json({ id: 'run_1' });
+    return Promise.resolve(Response.json({ id: 'run_1' }));
   });
-  assert.equal(response.status, 401);
-  assert.equal(calls, 0);
+  assertEquals(response.status, 401);
+  assertEquals(calls, 0);
 });
 
-test('enqueues private text once with stable idempotency and per-chat queue', async () => {
-  const bodies: unknown[] = [];
-  const http = async (_url: RequestInfo | URL, init?: RequestInit) => {
+Deno.test('enqueues private text once with stable idempotency and per-chat queue', async () => {
+  const bodies: { options: unknown }[] = [];
+  const http = (_url: RequestInfo | URL, init?: RequestInit) => {
     bodies.push(JSON.parse(String(init?.body)));
-    return Response.json({ id: 'run_1' });
+    return Promise.resolve(Response.json({ id: 'run_1' }));
   };
-  assert.equal((await handleRequest(request(update), config, http)).status, 200);
-  assert.equal((await handleRequest(request(update), config, http)).status, 200);
-  assert.equal(bodies.length, 2);
-  assert.deepEqual((bodies[0] as any).options, (bodies[1] as any).options);
-  assert.deepEqual((bodies[0] as any).options, {
+  assertEquals((await handleRequest(request(update), config, http)).status, 200);
+  assertEquals((await handleRequest(request(update), config, http)).status, 200);
+  assertEquals(bodies.length, 2);
+  assertEquals(bodies[0].options, bodies[1].options);
+  assertEquals(bodies[0].options, {
     idempotencyKey: 'pifai:tg:123', idempotencyKeyTTL: '7d', concurrencyKey: '42',
   });
 });
 
-test('ignores group/media updates and rejects malformed text', async () => {
-  const unreachable = async () => { throw new Error('must not enqueue'); };
-  assert.equal((await handleRequest(request({ ...update, message: { ...update.message, chat: { id: -1, type: 'supergroup' } } }), config, unreachable)).status, 200);
-  assert.equal((await handleRequest(request({ ...update, message: { ...update.message, text: undefined } }), config, unreachable)).status, 200);
-  assert.equal((await handleRequest(request({ ...update, message: { ...update.message, text: '' } }), config, unreachable)).status, 400);
+Deno.test('ignores group/media updates and rejects malformed text', async () => {
+  const unreachable = () => Promise.reject(new Error('must not enqueue'));
+  assertEquals((await handleRequest(request({ ...update, message: { ...update.message, chat: { id: -1, type: 'supergroup' } } }), config, unreachable)).status, 200);
+  assertEquals((await handleRequest(request({ ...update, message: { ...update.message, text: undefined } }), config, unreachable)).status, 200);
+  assertEquals((await handleRequest(request({ ...update, message: { ...update.message, text: '' } }), config, unreachable)).status, 400);
 });
 
-test('returns 503 when enqueue is not confirmed so Telegram retries', async () => {
-  const failure = async () => new Response('failure', { status: 500 });
-  assert.equal((await handleRequest(request(update), config, failure)).status, 503);
-  const brokenResponse = async () => Response.json({});
-  assert.equal((await handleRequest(request(update), config, brokenResponse)).status, 503);
+Deno.test('returns 503 when enqueue is not confirmed so Telegram retries', async () => {
+  const failure = () => Promise.resolve(new Response('failure', { status: 500 }));
+  assertEquals((await handleRequest(request(update), config, failure)).status, 503);
+  const brokenResponse = () => Promise.resolve(Response.json({}));
+  assertEquals((await handleRequest(request(update), config, brokenResponse)).status, 503);
 });
 
-test('health and method handling disclose no configuration', async () => {
+Deno.test('health and method handling disclose no configuration', async () => {
   const health = await handleRequest(new Request('https://bot.bunny.run/health'), config);
-  assert.deepEqual(await health.json(), { status: 'ok' });
-  assert.equal((await handleRequest(new Request('https://bot.bunny.run/webhook'), config)).status, 405);
+  assertEquals(await health.json(), { status: 'ok' });
+  assertEquals((await handleRequest(new Request('https://bot.bunny.run/webhook'), config)).status, 405);
 });

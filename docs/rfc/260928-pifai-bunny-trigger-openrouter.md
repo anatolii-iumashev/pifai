@@ -6,7 +6,7 @@ created: 2026-09-28
 
 # RFC: Перенос Telegram-бота ПиФ с Cloudflare на Bunny и Trigger.dev
 
-- [ ] Hop faster, build smarter with Deno. Powered by Deno, Bunny Edge Scripting makes the edge your playground.
+- [x] Hop faster, build smarter with Deno. Powered by Deno, Bunny Edge Scripting makes the edge your playground. `includes/edge` собирается и тестируется нативно в Deno: `deno.json` (tasks, import map), `deno test`, `deno check`/`deno lint`, `deno bundle`; Node/npm-инструментарий удалён.
 
 ## Вводные
 
@@ -58,7 +58,7 @@ created: 2026-09-28
 
 ### 4. Переключение и откат
 
-- Bunny script уже опубликован по адресу `https://pifai-telegram-webhook-cxv54.bunny.run` (script ID `92871`): `/health` возвращает 200, `GET /webhook` — 405. Проект Trigger.dev `proj_rfldgyqffeltidshyifn` содержит версию задачи `20260928.1`. Токен Telegram, ключ запуска Trigger.dev, Postgres и модель ещё не настроены; продовый webhook не переключён.
+- Bunny script уже опубликован по адресу `https://pifai-telegram-webhook-cxv54.bunny.run` (script ID `92871`): `/health` возвращает 200, `GET /webhook` — 405. Задача повторно развёрнута из `includes/consult` в проект Trigger.dev `proj_rfldgyqffeltidshyifn`, версия `20260928.2`. Токен Telegram, ключ запуска Trigger.dev, Postgres и модель ещё не настроены; продовый webhook не переключён.
 - Для функционального запуска применить миграцию БД, задать оставшиеся секреты Trigger.dev и Bunny, проверить задачу на тестовом боте.
 - Продовый `setWebhook` существующего бота делать после оценки качества и приватности, без `drop_pending_updates`. Проверить `getWebhookInfo` и реальные диалоги.
 - Для отката вернуть прежний URL Cloudflare Worker через `setWebhook`. После периода наблюдения удалить активные Cloudflare/Groq зависимости. Job автоматического Cloudflare-деплоя отключён, сам Worker пока остаётся в аккаунте.
@@ -94,7 +94,7 @@ created: 2026-09-28
 
 ### 1. Локальные тесты
 
-- [includes/edge/test/handler.test.ts](../../includes/edge/test/handler.test.ts) — `cd includes/edge && npm ci && npm test && npm run check && npm run build`.
+- [includes/edge/test/handler.test.ts](../../includes/edge/test/handler.test.ts) — `cd includes/edge && deno task test && deno task check && deno task build` (Deno 2.4+).
 - [includes/consult/test/processor.test.ts](../../includes/consult/test/processor.test.ts) и [includes/consult/test/telegram.test.ts](../../includes/consult/test/telegram.test.ts) — `cd includes/consult && npm ci && npm test && npm run check`.
 - [includes/consult/eval/questions.json](../../includes/consult/eval/questions.json) — 30 размеченных вопросов, запуск `cd includes/consult && npm run eval`.
 
