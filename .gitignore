@@ -4,6 +4,7 @@ npm-debug.log
 
 # Build output
 dist
+.cache/
 .astro
 .bunny/
 .wrangler/

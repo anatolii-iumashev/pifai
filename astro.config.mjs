@@ -99,6 +99,10 @@ export default defineConfig({
 
       head: [
         {
+          tag: "meta",
+          attrs: { name: "pifai-build-id", content: process.env.RAG_BUILD_ID ?? "development" },
+        },
+        {
           tag: "link",
           attrs: {
             rel: "icon",

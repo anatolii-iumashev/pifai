@@ -1,6 +1,6 @@
 ---
 title: "Build-time RAG-индекс базы знаний ПиФ как инструмент LangChain"
-status: draft # draft | discovery | delivery | done
+status: delivery # draft | discovery | delivery | done
 created: 2026-09-28
 ---
 
@@ -135,6 +135,10 @@ Wiki ПиФ поддерживается LLM-агентами по схеме «
 ## Итого и рекомендации
 
 Строим RAG как **артефакт билда сайта**: те же Content Collections дают `dist/rag/` (чанки + manifest + опциональные кешируемые эмбеддинги) с тем же `buildId`, что и опубликованная wiki. Бот читает артефакт и отдаёт поиск LangChain-агенту как инструмент `search_knowledge_base`, начиная с BM25. Гибрид с векторами включается только по результату оценки. LLM Wiki остаётся механизмом написания базы, RAG становится механизмом её чтения ботом.
+
+## Уточнение перед реализацией
+
+На момент старта Delivery рабочий код консультации уже находится в `includes/consult`: он собирает `generated/knowledge.json` скриптом `scripts/build-knowledge.mjs` и использует его в `src/retriever.ts`. Поэтому переключение на опубликованный артефакт относится прежде всего к `includes/consult`. `includes/bot/src/knowledge.ts` и его генератор остаются в старом Cloudflare Worker для отката до закрытия RFC миграции; этот RFC не удаляет резервный бот. Имеющиеся 30 вопросов в `includes/consult/eval/questions.json` служат основой расширенного набора оценки.
 
 ## Тест инструкции
 

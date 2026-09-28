@@ -11,9 +11,12 @@
     "deploy": "npm run build:knowledge && trigger deploy"
   },
   "dependencies": {
+    "@langchain/core": "^1.2.13",
     "@trigger.dev/sdk": "^4.5.16",
     "pg": "^8.13.0",
-    "yaml": "^2.8.0"
+    "snowball-stemmers": "^0.6.0",
+    "yaml": "^2.8.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

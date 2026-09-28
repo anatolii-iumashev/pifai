@@ -3,14 +3,14 @@ import type { DialogueStore } from './store.js';
 import type { ModelClient } from './openrouter.js';
 import type { TelegramClient } from './telegram.js';
 import type { KnowledgeChunk } from './retriever.js';
-import { search, knowledgeVersion } from './retriever.js';
+import { searchPublishedKnowledge } from './rag/runtime.js';
 import { cleanModelText, crisisResponse, isCrisis, unavailableResponse } from './safety.js';
 
 export interface Dependencies {
   store: DialogueStore;
   model: ModelClient;
   telegram: TelegramClient;
-  retrieve?: (question: string, previousUser: string) => KnowledgeChunk[];
+  retrieve?: (question: string, previousUser: string) => KnowledgeChunk[] | Promise<KnowledgeChunk[]>;
   log?: (event: Record<string, string | number | undefined>) => void;
 }
 
@@ -29,6 +29,7 @@ export async function processConsultation(input: unknown, deps: Dependencies): P
   const existing = await deps.store.getOrCreate(job);
   if (existing.status === 'delivered' || existing.status === 'attempted') return { status: existing.status };
   let response = existing.responseText;
+  let knowledgeVersion = 'none';
   if (existing.status === 'processing') {
     const command = job.text.match(/^\/(start|help|clear)(?:@\w+)?(?:\s|$)/i)?.[1]?.toLowerCase();
     let modelName = 'none';
@@ -46,7 +47,11 @@ export async function processConsultation(input: unknown, deps: Dependencies): P
     } else {
       const history = await deps.store.history(job.chatId);
       const previousUser = [...history].reverse().find((message) => message.role === 'user')?.content ?? '';
-      const sources = (deps.retrieve ?? search)(job.text, previousUser);
+      const knowledge = deps.retrieve
+        ? { chunks: await deps.retrieve(job.text, previousUser), buildId: 'injected' }
+        : await searchPublishedKnowledge(job.text, previousUser);
+      const sources = knowledge.chunks;
+      knowledgeVersion = knowledge.buildId;
       try {
         const answer = await deps.model.answer(job.text, history, sources);
         modelName = answer.model;
