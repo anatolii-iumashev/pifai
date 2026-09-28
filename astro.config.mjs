@@ -6,10 +6,10 @@ const isGitHubPagesBuild = process.env.GITHUB_ACTIONS === "true";
 
 const SITE_URL = process.env.CNAME
   ? `https://${process.env.CNAME}`
-  : "https://anatolii-iumashev.github.io/pif";
+  : "https://anatolii-iumashev.github.io/pifai";
 
-  // Use /pif only for GitHub Pages CI builds; keep local dev/preview on root.
-const BASE = process.env.CNAME ? "/" : (isGitHubPagesBuild ? "/pif" : "/");
+  // Use /pifai only for GitHub Pages CI builds; keep local dev/preview on root.
+const BASE = process.env.CNAME ? "/" : (isGitHubPagesBuild ? "/pifai" : "/");
 
 export default defineConfig({
   site: SITE_URL,
