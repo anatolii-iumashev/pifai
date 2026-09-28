@@ -24,7 +24,17 @@ jobs:
           node-version: 22
           cache: "npm"
       - run: npm ci
-      - run: npm run build
+      - uses: actions/cache@v4
+        with:
+          path: .cache/rag-embeddings.json
+          key: rag-embeddings-${{ vars.RAG_EMBED_MODEL }}-${{ hashFiles('src/content/docs/**', 'src/content/quotes/**') }}
+          restore-keys: rag-embeddings-${{ vars.RAG_EMBED_MODEL }}-
+      - run: npm run check && npm run test:rag
+        env:
+          RAG_EMBEDDINGS: on
+          RAG_EMBED_BASE_URL: ${{ vars.RAG_EMBED_BASE_URL }}
+          RAG_EMBED_MODEL: ${{ vars.RAG_EMBED_MODEL }}
+          RAG_EMBED_API_KEY: ${{ secrets.RAG_EMBED_API_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist

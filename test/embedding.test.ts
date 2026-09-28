@@ -28,10 +28,11 @@ test('embedding build writes binary vectors and reuses unchanged content hashes'
   const address = server.address();
   if (!address || typeof address === 'string') throw new Error('No test server address');
   const script = resolve('scripts/build-rag-embeddings.ts');
+  const tsxLoader = import.meta.resolve('tsx');
   const run = async () => {
     writeFileSync(chunksPath, JSON.stringify(chunks));
     await new Promise<void>((done, reject) => {
-      const child = spawn(process.execPath, ['--import', 'tsx', script], {
+      const child = spawn(process.execPath, ['--import', tsxLoader, script], {
         cwd: root,
         env: { ...process.env, RAG_EMBEDDINGS: 'on', RAG_EMBED_API_KEY: 'test', RAG_EMBED_MODEL: 'test-multilingual', RAG_EMBED_BASE_URL: `http://127.0.0.1:${address.port}`, RAG_BUILD_ID: 'test-build' },
         stdio: 'pipe',

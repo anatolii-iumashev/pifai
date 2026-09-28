@@ -16,7 +16,8 @@
     "astro": "^6.1.9",
     "github-slugger": "^2.0.0",
     "starlight-theme-obsidian": "^0.4.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "tsx": "^4.23.15"

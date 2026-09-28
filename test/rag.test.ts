@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { z } from 'astro/zod';
+import YAML from 'yaml';
 import { buildRagChunks, RAG_CHUNK_CONFIG, type RagPage } from '../src/lib/rag';
 
 const chunkSchema = z.object({
@@ -44,9 +45,17 @@ test('built artifact has complete corpus, valid hashes, pages and anchors', () =
   const manifest = JSON.parse(readFileSync(resolve(root, 'rag/manifest.json'), 'utf8'));
   assert.equal(manifest.files['chunks.json'], `sha256:${createHash('sha256').update(chunksBytes).digest('hex')}`);
   assert.equal(manifest.chunkCount, chunks.length);
-  assert.equal(manifest.quoteCount, 78);
-  assert.equal(manifest.pageCount, 47);
-  assert.equal(chunks.filter((chunk) => chunk.kind === 'quote').length, 78);
+  const quoteFiles = readdirSync(resolve('src/content/quotes')).filter((name) => name.endsWith('.yaml'));
+  const quoteCount = quoteFiles.reduce((sum, name) => sum + YAML.parse(readFileSync(resolve('src/content/quotes', name), 'utf8')).quotes.length, 0);
+  const countPages = (directory: string): number => readdirSync(directory, { withFileTypes: true }).reduce((sum, entry) => {
+    const path = resolve(directory, entry.name);
+    if (entry.isDirectory()) return sum + countPages(path);
+    if (!/\.(md|mdx)$/.test(entry.name) || path.endsWith('/docs/index.md') || path.endsWith('/docs/log.md')) return sum;
+    return sum + (readFileSync(path, 'utf8').match(/^draft:\s*true\s*$/m) ? 0 : 1);
+  }, 0);
+  assert.equal(manifest.quoteCount, quoteCount);
+  assert.equal(manifest.pageCount, countPages(resolve('src/content/docs')));
+  assert.equal(chunks.filter((chunk) => chunk.kind === 'quote').length, quoteCount);
   const home = readFileSync(resolve(root, 'index.html'), 'utf8');
   assert.match(home, new RegExp(manifest.buildId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   const basePath = new URL(manifest.siteUrl).pathname;

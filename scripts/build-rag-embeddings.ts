@@ -31,8 +31,9 @@ if (embeddingEnabled) {
       });
       if (!response.ok) throw new Error(`Embedding API returned ${response.status}`);
       const result = await response.json() as { data?: { embedding?: number[] }[] };
-      vector = result.data?.[0]?.embedding;
-      if (!vector?.length || vector.some((item) => !Number.isFinite(item))) throw new Error(`Invalid embedding for ${chunk.id}`);
+      const received = result.data?.[0]?.embedding;
+      if (!received?.length || received.some((item) => !Number.isFinite(item))) throw new Error(`Invalid embedding for ${chunk.id}`);
+      vector = received;
       cache[key] = vector;
       requests++;
     }
