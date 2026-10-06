@@ -26,6 +26,12 @@ description: "База знаний чат-бота ПиФ: ННО, юнгиан
   - [Техника заземления 5-4-3-2-1](./practices/grounding-5-4-3-2-1.md)
   - [Техника парадоксальной интенции](./practices/paradoxical-intention-exercise.md)
   - [Техника амортизации в конфликте](./practices/amortization-exercise.md)
+  - [Йога](./practices/yoga/index.md) — обзор видов йоги
+    - [Карма-йога](./practices/yoga/karma-yoga.md) — путь бескорыстного действия
+    - [Джнана-йога](./practices/yoga/jnana-yoga.md) — путь знания и самоисследования
+    - [Бхакти-йога](./practices/yoga/bhakti-yoga.md) — путь любви и преданности
+    - [Раджа-йога](./practices/yoga/raja-yoga.md) — путь медитации и управления умом
+    - [Хатха-йога](./practices/yoga/hatha-yoga.md) — путь тела и дыхания
 
 ## 4. Цитаты великих людей
 

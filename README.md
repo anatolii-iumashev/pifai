@@ -90,6 +90,12 @@ pl-chat/
   - [Техника амортизации в конфликте](src/content/docs/practices/amortization-exercise.md)
   - [Дневник эмоций и потребностей](src/content/docs/practices/emotional-diary.md)
   - [Техника заземления 5-4-3-2-1](src/content/docs/practices/grounding-5-4-3-2-1.md)
+  - [Йога](src/content/docs/practices/yoga/index.md) — обзор видов йоги
+    - [Карма-йога](src/content/docs/practices/yoga/karma-yoga.md) — путь бескорыстного действия
+    - [Джнана-йога](src/content/docs/practices/yoga/jnana-yoga.md) — путь знания и самоисследования
+    - [Бхакти-йога](src/content/docs/practices/yoga/bhakti-yoga.md) — путь любви и преданности
+    - [Раджа-йога](src/content/docs/practices/yoga/raja-yoga.md) — путь медитации и управления умом
+    - [Хатха-йога](src/content/docs/practices/yoga/hatha-yoga.md) — путь тела и дыхания
 - **[4. Цитаты великих людей](src/content/docs/quotes/index.md)** — 78 записей от 21 автора по десяти темам
   - [Самопознание и внутренняя работа](src/content/docs/quotes/self-knowledge.mdx)
   - [Смерть и Жизнь](src/content/docs/quotes/memento-mori.mdx)
