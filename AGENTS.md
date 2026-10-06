@@ -10,7 +10,8 @@ Key RFC ([docs/rfc/260517-kb-pl-chat.md](./docs/rfc/260517-kb-pl-chat.md))
 
 ```
 pl-chat/
-├── raw/                       # Immutable source documents — READ ONLY
+├── raw/
+│   ├── inbox/                 # New sources awaiting processing
 │   └── YYYY/                  # Year (e.g. 2026)
 │       └── MMDD/              # Month + Day (e.g. 0501 = May 1)
 │           └── file.{md,pdf}  # Source files
@@ -90,14 +91,14 @@ When fetching a URL for ingest, use tools in priority order:
 2. **Fallback:** `web_fetch` with `extractMode: "markdown"`
 3. **Last resort:** `skills/jina-ai/extract.mjs <URL>` — for Cloudflare-protected sites
 
-Save extracted content to `raw/YYYY/MMDD/` before ingesting.
+Save extracted content to `raw/inbox/` before ingesting. After processing, move it to `raw/YYYY/MMDD/` (using the processing date); date-organized files are the immutable archive.
 
 ### Ingest
 
 When asked to ingest a source:
 
-0. **Fetch the source** — use extraction tools above if URL, save to `raw/YYYY/MMDD/`
-1. **Read the source** from `raw/YYYY/MMDD/` or provided URL
+0. **Fetch the source** — use extraction tools above if URL, save to `raw/inbox/`
+1. **Read the source** from `raw/inbox/` (preferred), an archived `raw/YYYY/MMDD/` file, or a provided URL
 2. **Read `src/content/docs/index.md`** to understand current wiki structure
 3. **Discuss key takeaways** with the user before writing:
    - 3-5 main points
@@ -128,6 +129,8 @@ When asked to ingest a source:
 9. **Report**: list all files created/modified
 
 A single source typically touches 5-15 wiki pages. Don't be lazy — update everything relevant.
+
+After ingesting a source from `raw/inbox/`, move it to `raw/YYYY/MMDD/` (using the processing date). Treat archived date-organized sources as immutable. `raw/inbox/` is the only staging area; it may be edited or cleared as part of intake/processing.
 
 ### Query
 
@@ -199,7 +202,7 @@ Use this mapping for task routing:
 All wiki skills must enforce:
 
 1. Read `src/content/docs/index.md` before query/update work
-2. Never modify `raw/` documents
+2. Never modify archived documents under `raw/YYYY/MMDD/`; `raw/inbox/` is writable staging and may be moved or cleared during processing
 3. Keep `index.md` and `log.md` synchronized with operations
 4. Maintain bidirectional cross-references where relevant
 5. Keep wiki content in ru-RU and include required frontmatter (`title`, `description`)

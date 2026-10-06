@@ -18,7 +18,8 @@ Expected core files:
 - `AGENTS.md`
 
 Expected raw structure:
-- `raw/YYYY/MMDD/` — date-organized immutable sources
+- `raw/inbox/` — writable intake folder for new sources awaiting processing
+- `raw/YYYY/MMDD/` — date-organized immutable archive; move sources here after processing
 
 Expected category folders:
 - `core/`, `plugins/`, `themes/`, `security/`, `performance/`, `snippets/`, `queries/`
@@ -46,7 +47,7 @@ Expected category folders:
 
 ## Guardrails
 
-- Never modify `raw/` sources during init.
+- Never modify archived `raw/YYYY/MMDD/` sources during init. `raw/inbox/` is a writable staging area.
 - Preserve existing useful content whenever possible.
 - Prefer minimal edits over full rewrites.
 
