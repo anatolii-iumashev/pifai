@@ -16,17 +16,20 @@ This setup follows:
 ## Repository Scope
 
 Wiki root in this repo:
-- Sources: `raw/YYYY/MMDD/file.{md,pdf}` (immutable, date-organized)
+- Incoming sources: `raw/inbox/file.{md,pdf}` (staging area)
+- Archived sources: `raw/YYYY/MMDD/file.{md,pdf}` (immutable, date-organized)
 - Pages: `src/content/docs/`
 - Catalog: `src/content/docs/index.md`
 - Log: `src/content/docs/log.md`
 
 ### Raw Structure
 
-Sources are organized by ingestion date:
+New sources first arrive in `raw/inbox/`. After ingest, archive them by processing date:
 
 ```
 raw/
+  inbox/          # New sources awaiting processing
+    article.md
   2026/
     0501/          # May 1, 2026
       article.md
@@ -37,7 +40,8 @@ raw/
 - Top level: `YYYY` (year)
 - Second level: `MMDD` (month + day, zero-padded)
 - Files: original filenames preserved
-- Never modify files under `raw/`
+- `raw/inbox/` is a writable staging area; process new materials from here and move them into the dated archive after ingest.
+- Never modify archived files under `raw/YYYY/MMDD/`.
 - When fetching URLs for ingest, use `summarize "URL" --extract --format md` as the primary extraction tool (better image/media preservation than web_fetch)
 
 ## Routing Rules
@@ -45,6 +49,7 @@ raw/
 Use this mapping:
 - Structure bootstrap or repair -> `wiki-init`
 - Add source content -> `wiki-ingest`
+- Raw-only save -> put new source in `raw/inbox/`; do not create wiki pages unless explicitly asked for full ingest
 - Answer from wiki pages -> `wiki-query`
 - Health audit -> `wiki-lint`
 - Revise existing content -> `wiki-update`
@@ -66,8 +71,9 @@ These rules apply to all wiki-* skills:
 1. Read-first:
 - Read `src/content/docs/index.md` before query/update work.
 
-2. Raw is immutable:
-- Never modify files under `raw/`.
+2. Raw archive is immutable:
+- Never modify files under `raw/YYYY/MMDD/`.
+- `raw/inbox/` is the writable intake area; after ingest, move processed sources to the dated archive.
 
 3. Bookkeeping is mandatory:
 - Keep `index.md` and `log.md` updated on ingest, update, lint, and filed query operations.

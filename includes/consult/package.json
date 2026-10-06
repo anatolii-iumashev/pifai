@@ -1,0 +1,30 @@
+{
+  "name": "pifai-consult",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:legacy-knowledge": "node scripts/build-knowledge.mjs",
+    "check": "tsc --noEmit",
+    "test": "tsx --test test/*.test.ts",
+    "eval": "npm run build:legacy-knowledge && tsx eval/run.ts",
+    "eval:retrieval": "tsx eval/retrieval.ts",
+    "dev": "trigger dev",
+    "deploy": "trigger deploy"
+  },
+  "dependencies": {
+    "@langchain/core": "^1.2.13",
+    "@trigger.dev/sdk": "^4.5.16",
+    "pg": "^8.13.0",
+    "snowball-stemmers": "^0.6.0",
+    "yaml": "^2.8.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.0",
+    "langchain": "^1.5.14",
+    "trigger.dev": "^4.5.16",
+    "tsx": "^4.22.0",
+    "typescript": "^5.9.0"
+  }
+}

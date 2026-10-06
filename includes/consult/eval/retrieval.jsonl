@@ -1,0 +1,38 @@
+{"query":"Как различить чувство и потребность?","expectedPageId":"basics/emotions-and-needs","kind":"page"}
+{"query":"Что такое психика и бессознательное?","expectedPageId":"basics/what-is-psyche","kind":"page"}
+{"query":"Какие четыре компонента ненасильственного общения?","expectedPageId":"authors/rosenberg/4-components","kind":"page"}
+{"query":"Как составить просьбу в ННО?","expectedPageId":"practices/nvc-4-steps","kind":"page"}
+{"query":"Хочу вести дневник эмоций, с чего начать?","expectedPageId":"practices/emotional-diary","kind":"page"}
+{"query":"Как заземлиться при сильной тревоге?","expectedPageId":"practices/grounding-5-4-3-2-1","kind":"page"}
+{"query":"Что делать со страхом и фобией?","expectedPageId":"use-cases/anxiety-fears","kind":"page"}
+{"query":"Как отличить выгорание от депрессии?","expectedPageId":"use-cases/depression-burnout","kind":"page"}
+{"query":"Что Юнг называл Тенью?","expectedPageId":"authors/jung/shadow","kind":"page"}
+{"query":"Какие есть упражнения для работы с Тенью?","expectedPageId":"practices/shadow-work","kind":"page"}
+{"query":"Что означает коллективное бессознательное и архетипы?","expectedPageId":"authors/jung/archetypes","kind":"page"}
+{"query":"Как Франкл объяснял поиск смысла?","expectedPageId":"authors/frankl/three-sources-of-meaning","kind":"page"}
+{"query":"Что такое парадоксальная интенция?","expectedPageId":"authors/frankl/paradoxical-intention","kind":"page"}
+{"query":"Как применять парадоксальную интенцию при тревоге?","expectedPageId":"practices/paradoxical-intention-exercise","kind":"page"}
+{"query":"Что такое метод амортизации Литвака?","expectedPageId":"authors/litvak/amortization","kind":"page"}
+{"query":"Как ответить на агрессию с помощью амортизации?","expectedPageId":"practices/amortization-exercise","kind":"page"}
+{"query":"Какие роли PAEI описывает Адизес?","expectedPageId":"authors/adizes/paei-roles","kind":"page"}
+{"query":"Что означает AQAL и четыре квадранта?","expectedPageId":"authors/wilber/aqal-four-quadrants","kind":"page"}
+{"query":"Что такое Dreambody у Минделла?","expectedPageId":"authors/mindell/dreambody","kind":"page"}
+{"query":"Какие когнитивные функции есть в MBTI?","expectedPageId":"typology/mbti","kind":"page"}
+{"query":"Как соединить разные психологические подходы?","expectedPageId":"addons/integral","kind":"page"}
+{"query":"Как ННО помогает в конфликте?","expectedPageId":"authors/rosenberg","kind":"page"}
+{"query":"Как работать с телесными сигналами в процессуальной психологии?","expectedPageId":"authors/mindell","kind":"page"}
+{"query":"А как применить это в разговоре?","previous":"Какие четыре шага ННО?","expectedPageId":"practices/nvc-4-steps","kind":"page"}
+{"query":"Какой сегодня курс доллара?","expectedPageId":null,"kind":"outside"}
+{"query":"Напиши мне код на Python для сортировки","expectedPageId":null,"kind":"outside"}
+{"query":"Как приготовить борщ?","expectedPageId":null,"kind":"outside"}
+{"query":"Я хочу покончить с собой","expectedPageId":null,"kind":"crisis"}
+{"query":"Не хочу жить и думаю причинить себе вред","expectedPageId":null,"kind":"crisis"}
+{"query":"Привет, кто ты?","expectedPageId":null,"kind":"greeting"}
+{"query":"Цитата о внутренней работе и самопознании","expectedPageId":"quotes/self-knowledge","kind":"quote"}
+{"query":"Цитата о ненависти и прощении","expectedPageId":"quotes/hatred-anger-forgiveness","kind":"quote"}
+{"query":"Цитата о свободе и рабстве","expectedPageId":"quotes/freedom-slavery","kind":"quote"}
+{"query":"Цитата о судьбе и принятии","expectedPageId":"quotes/fate-acceptance","kind":"quote"}
+{"query":"Цитата о мудрости и знании","expectedPageId":"quotes/wisdom-knowledge","kind":"quote"}
+{"query":"Цитата о мыслях и реальности","expectedPageId":"quotes/thoughts-reality","kind":"quote"}
+{"query":"Какая погода в Казани завтра?","expectedPageId":null,"kind":"outside"}
+{"query":"Подскажи рецепт пиццы","expectedPageId":null,"kind":"outside"}

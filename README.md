@@ -46,8 +46,9 @@ GitHub: https://github.com/anatolii-iumashev/pifai
 
 ```
 pl-chat/
-├── raw/                       # Immutable источники
-│   └── YYYY/MMDD/             # Дата-организованные файлы
+├── raw/
+│   ├── inbox/                 # Новые материалы для обработки
+│   └── YYYY/MMDD/             # Неизменяемый архив по дате обработки
 ├── src/content/docs/          # Wiki-страницы
 │   ├── basics/                # 1. База и вводные — с чего начать
 │   ├── use-cases/              # 2. Проблематика и Use cases
@@ -89,6 +90,12 @@ pl-chat/
   - [Техника амортизации в конфликте](src/content/docs/practices/amortization-exercise.md)
   - [Дневник эмоций и потребностей](src/content/docs/practices/emotional-diary.md)
   - [Техника заземления 5-4-3-2-1](src/content/docs/practices/grounding-5-4-3-2-1.md)
+  - [Йога](src/content/docs/practices/yoga/index.md) — обзор видов йоги
+    - [Карма-йога](src/content/docs/practices/yoga/karma-yoga.md) — путь бескорыстного действия
+    - [Джнана-йога](src/content/docs/practices/yoga/jnana-yoga.md) — путь знания и самоисследования
+    - [Бхакти-йога](src/content/docs/practices/yoga/bhakti-yoga.md) — путь любви и преданности
+    - [Раджа-йога](src/content/docs/practices/yoga/raja-yoga.md) — путь медитации и управления умом
+    - [Хатха-йога](src/content/docs/practices/yoga/hatha-yoga.md) — путь тела и дыхания
 - **[4. Цитаты великих людей](src/content/docs/quotes/index.md)** — 78 записей от 21 автора по десяти темам
   - [Самопознание и внутренняя работа](src/content/docs/quotes/self-knowledge.mdx)
   - [Смерть и Жизнь](src/content/docs/quotes/memento-mori.mdx)
@@ -128,33 +135,27 @@ pl-chat/
 ---
 ## 🤖 Чат-бот (Telegram)
 
-Telegram-бот на стеке **Node.js + Cloudflare Workers + Groq (Llama-3.3-70B)** с базой знаний из вики.
+Сайт и база знаний публикуются на GitHub Pages. Новая версия Telegram-бота построена на **Bunny Edge Scripting → Trigger.dev → OpenRouter**; продовый webhook пока остаётся на старом Cloudflare Worker до проверки новой цепочки.
 
 ### Архитектура
 
 ```
-bot/
-├── src/
-│   ├── index.ts           # Cloudflare Workers entry (webhook + health)
-│   ├── bot.ts             # Обработчики Telegram + RAG-обогащение контекста
-│   ├── knowledge.ts       # База знаний + индекс чанков для RAG-поиска (авто-генерация)
-│   ├── retriever.ts       # RAG-поиск по wiki: поиск релевантных статей + цитирование
-│   ├── llm.ts             # Клиент Groq API (CF Workers compatible)
-│   ├── session.ts         # История чатов (Cloudflare KV)
-│   ├── prompts.ts         # System prompt + шаблоны
-│   └── utils.ts           # Вспомогательные функции
-├── scripts/
-│   └── build-knowledge.ts # Скрипт сборки знаний из src/content/docs/ + генерация чанков
-├── wrangler.toml          # Cloudflare Workers конфиг
-├── package.json
-└── .dev.vars              # Локальные переменные (не коммитить)
+includes/edge/                # Bunny standalone Edge Script: Telegram webhook
+includes/consult/             # Trigger.dev задача, OpenRouter, Postgres, поиск по wiki
+  ├── migrations/001_dialogues.sql
+  ├── scripts/build-knowledge.mjs
+  ├── src/trigger/consult-telegram.ts
+  └── eval/questions.json
+includes/bot/                 # Прежний Cloudflare Worker для отката
+includes/landing/             # Отдельная посадочная страница
 ```
 
 ### Ключевые особенности
 
-- **RAG-архитектура**: на каждый запрос пользователя бот ищет релевантные статьи из wiki, добавляет их в контекст LLM и цитирует источники
-- **Цитирование**: ответы содержат ссылки на конкретные страницы базы знаний (`https://anatolii-iumashev.github.io/pifai/...`)
-- **Настраиваемый URL базы знаний**: домен задаётся через переменную `KNOWLEDGE_BASE_URL`
+- **Webhook**: Bunny проверяет секрет Telegram и ставит задачу в Trigger.dev; консультация не выполняется на границе.
+- **Знания**: при деплое Trigger.dev собирается индекс из wiki и YAML-цитат. Ссылки ведут на прежний GitHub Pages URL (`https://anatolii-iumashev.github.io/pifai/...`).
+- **История**: Postgres хранит 20 последних сообщений чата не дольше семи дней; при неопределённой доставке повторная отправка блокируется.
+- **Проверка и развёртывание**: [RFC миграции](docs/rfc/260928-pifai-bunny-trigger-openrouter.md) содержит команды тестов, окружения и порядок переключения webhook.
 
 ### Быстрый старт
 
@@ -187,17 +188,18 @@ bot/
 
 **1. Raw-only (сохранить источник)**
 - Триггеры: «сохрани туда», «закинь ссылку», «скачай в базу»
-- Процесс: извлечение через `summarize "URL" --extract --format md` → сохранение в `raw/YYYY/MMDD/`
+- Процесс: извлечение через `summarize "URL" --extract --format md` → сохранение в `raw/inbox/`
 - ⚠️ Не создаёт wiki-страницы, только raw-источник
 
 **2. Full Ingest (обработать + вики)**
 - Триггеры: «ingest», «добавь в базу», «обработай»
 - Процесс:
-  1. Извлечение контента в `raw/YYYY/MMDD/`
+  1. Извлечение контента в `raw/inbox/`
   2. Синтез key takeaways (3-5 главных тезисов)
   3. Создание/обновление страниц в `src/content/docs/<category>/`
   4. Обновление `index.md` и `log.md`
   5. Перекрёстные ссылки
+  6. Перенос обработанного источника в `raw/YYYY/MMDD/` (архив по дате обработки)
 
 **⚠️ Full Ingest запускает только пользователь.** Без явной команды — только raw.
 
@@ -310,7 +312,9 @@ npm install -g @steipete/summarize
 
 ```
 pl-chat/
-├── raw/                       # Immutable источники
+├── raw/                       # Входящие материалы и архив источников
+│   ├── inbox/                 # Новые материалы для обработки
+│   └── YYYY/MMDD/             # Неизменяемый архив по дате обработки
 ├── src/content/docs/          # Wiki-страницы (Markdown)
 │   ├── index.md               # Каталог
 │   └── log.md                 # Журнал
@@ -362,7 +366,8 @@ export async function getStaticPaths() {
 
 - **Язык:** Все wiki-страницы на русском (ru-RU)
 - **Тон:** Эмпатичный, точный, без воды
-- **Raw-источники:** Immutable (только чтение)
+- **Raw inbox:** новые материалы помещаются в `raw/inbox/`; обработанные переносятся в `raw/YYYY/MMDD/`
+- **Архив raw:** файлы в `raw/YYYY/MMDD/` неизменяемы (только чтение)
 - **Ссылки с `.md`:** Относительные ссылки в wiki всегда с `.md` (напр. `[text](./page.md)`)
 - **Frontmatter:** Каждая страница имеет `title` и `description`
 - **Без дублирования H1:** Frontmatter `title` рендерится как H1 автоматически

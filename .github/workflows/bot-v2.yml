@@ -1,0 +1,76 @@
+name: Bot v2
+
+on:
+  push:
+    paths:
+      - "includes/edge/**"
+      - "includes/consult/**"
+      - "src/content/docs/**"
+      - "src/content/quotes/**"
+      - "src/lib/rag.ts"
+      - "src/pages/rag/**"
+      - "scripts/build*"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/bot-v2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            includes/consult/package-lock.json
+      - run: npm ci && npm run test:rag
+      - run: deno task check && deno task test && deno task build
+        working-directory: includes/edge
+      - run: npm ci
+        working-directory: includes/consult
+      - run: npm run check && npm test && npm run eval:retrieval
+        working-directory: includes/consult
+
+  deploy:
+    if: github.event_name == 'workflow_dispatch'
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: includes/consult/package-lock.json
+      - run: npm ci
+        working-directory: includes/consult
+      - name: Deploy consultation task
+        run: |
+          node -e 'fetch(`${process.env.RAG_INDEX_SOURCE}/manifest.json`).then(r => r.json()).then(m => { if (!m.buildId?.startsWith(process.env.GITHUB_SHA)) throw new Error("Wiki RAG artifact does not match this commit"); console.log(`Wiki RAG ${m.buildId}`); })'
+          npm run deploy -- --external-id ${{ github.sha }}
+        working-directory: includes/consult
+        env:
+          RAG_INDEX_SOURCE: ${{ vars.RAG_INDEX_SOURCE || 'https://anatolii-iumashev.github.io/pifai/rag' }}
+          TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+          TRIGGER_PROJECT_REF: ${{ vars.TRIGGER_PROJECT_REF }}
+      - run: deno task build
+        working-directory: includes/edge
+      - name: Deploy Bunny webhook
+        run: npx @bunny.net/cli scripts deploy dist/index.js "$BUNNY_EDGE_SCRIPT_ID"
+        working-directory: includes/edge
+        env:
+          BUNNYNET_API_KEY: ${{ secrets.BUNNYNET_API_KEY }}
+          BUNNY_EDGE_SCRIPT_ID: ${{ vars.BUNNY_EDGE_SCRIPT_ID }}

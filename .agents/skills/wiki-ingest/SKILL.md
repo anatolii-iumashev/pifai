@@ -22,9 +22,10 @@ Compile a new source into the persistent wiki. **База знаний сфок�
 1. Read `src/content/docs/index.md` first.
 2. Read related existing pages before writing.
 3. Confirm source location:
-   - **Local:** `raw/YYYY/MMDD/filename.{md,pdf}` — date-organized, immutable
+   - **Local incoming source:** `raw/inbox/filename.{md,pdf}` — staging area; preferred location for new materials
+   - **Archived source:** `raw/YYYY/MMDD/filename.{md,pdf}` — date-organized, immutable
    - **URL:** fetch with `summarize "URL" --extract --format md` (primary), fallback to `web_fetch` or `skills/jina-ai/extract.mjs`
-4. If source is a URL, extract and save it to `raw/YYYY/MMDD/` (using current date), then ingest from that local copy.
+4. If source is a URL, extract and save it to `raw/inbox/`, then ingest from that local copy.
 
 ## Process
 
@@ -40,7 +41,8 @@ Compile a new source into the persistent wiki. **База знаний сфок�
 7. Update `src/content/docs/index.md` entries.
 8. Append `src/content/docs/log.md`:
    - `## [YYYY-MM-DD] ingest | <source title>`
-9. Report all touched files.
+9. Move the processed source from `raw/inbox/` to `raw/YYYY/MMDD/` using the processing date; never edit archived sources.
+10. Report all touched files.
 
 ## Placement Heuristic
 

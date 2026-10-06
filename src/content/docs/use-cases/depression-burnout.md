@@ -114,4 +114,5 @@ description: "Как различить депрессию, апатию и эм
 - [Оригинальная статья](https://bemeta.co/blog/depressiya-apatiya-vygoranie-kak-ih-razlichit/)
 - [Тревога, страхи, фобии](./anxiety-fears.md)
 - [Три источника смысла](../authors/frankl/three-sources-of-meaning.md)
+- [Карма-йога](../practices/yoga/karma-yoga.md) — действие без привязанности к результату как профилактика выгорания
 - [Эмоции и потребности](../basics/emotions-and-needs.md)

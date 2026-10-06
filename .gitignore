@@ -4,7 +4,12 @@ npm-debug.log
 
 # Build output
 dist
+.cache/
 .astro
+.bunny/
+.wrangler/
+.trigger/
+includes/consult/generated/
 
 # Logs
 logs

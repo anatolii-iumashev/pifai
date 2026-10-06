@@ -12,7 +12,7 @@ description: Создание и поддержка FAQ-страниц в вик
 1. Read `src/content/docs/index.md`
 2. Read relevant wiki pages
 3. Read related `faq/` pages to avoid duplication
-4. If a `raw/` source file is provided — read it fully and synthesize
+4. When using a raw source, check `raw/inbox/` first for incoming material, then archived `raw/YYYY/MMDD/` sources; read the selected file fully and synthesize
 
 ## Process
 

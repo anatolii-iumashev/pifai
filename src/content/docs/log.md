@@ -91,3 +91,16 @@ Chronological log of all wiki operations.
 ## [2026-09-28] update | Цитаты → YAML content collection
 
 Перенесено 107 цитатных блоков из авторских секций: после дедупликации получено 78 цитат у 21 автора. Тематические страницы переведены на MDX и используют компонент выборки цитат.
+
+## [2026-10-06] ingest | Карма-йога и раздел «Йога» в практиках
+
+- Источник: raw/inbox/karma.md → raw/2026/1006/karma.md
+- Создан подраздел practices/yoga/:
+  - practices/yoga/index.md — обзор видов йоги (4 классических пути + хатха, выбор по складу личности, связь с психологией)
+  - practices/yoga/karma-yoga.md — карма-йога по источнику: нишкама-карма, свадхарма, саматва, сценарии применения
+  - practices/yoga/jnana-yoga.md — путь знания: вивека, атма-вичара, три стадии усвоения
+  - practices/yoga/bhakti-yoga.md — путь любви: киртан, джапа, сева
+  - practices/yoga/raja-yoga.md — 8 ступеней Патанджали
+  - practices/yoga/hatha-yoga.md — асаны, пранаяма, связь тела и психики
+- Обновлены: practices/index.md (категория «Йога»), index.md, README.md
+- Бэклинки: use-cases/depression-burnout.md → карма-йога (профилактика выгорания)
