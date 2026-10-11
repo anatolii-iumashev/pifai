@@ -1,0 +1,25 @@
+---
+import SiteTitle from '@astrojs/starlight/components/SiteTitle.astro';
+import config from 'virtual:starlight/user-config';
+---
+
+<div class="site-brand">
+  <SiteTitle />
+  {config.description && <span class="site-tagline">{config.description}</span>}
+</div>
+
+<style>
+  .site-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .site-tagline {
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-xs);
+    line-height: 1.3;
+  }
+</style>

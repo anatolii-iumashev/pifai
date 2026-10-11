@@ -21,8 +21,9 @@ export default defineConfig({
 
   integrations: [
     starlight({
-      title: "ПиФ — Бот + БЗ",
-      description: "База знаний по психологии и философии. Чат-бот психотерапевт.",
+      title: "Pifai",
+      description: "Психология и философия + БЗ + ИИ",
+      favicon: "/yin-yang.png",
       sidebar: [
         {
           label: "База и вводные",
@@ -107,18 +108,11 @@ export default defineConfig({
           tag: "meta",
           attrs: { name: "pifai-build-id", content: process.env.RAG_BUILD_ID ?? "development" },
         },
-        {
-          tag: "link",
-          attrs: {
-            rel: "icon",
-            type: "image/png",
-            href: `${BASE.replace(/\/$/, "")}/yin-yang.png`,
-          },
-        },
       ],
       components: {
+        SiteTitle: "./src/components/SiteTitle.astro",
         Sidebar: "starlight-theme-obsidian/overrides/Sidebar.astro",
-        PageFrame: "starlight-theme-obsidian/overrides/PageFrame.astro",
+        PageFrame: "./src/components/PageFrame.astro",
         PageSidebar: "./src/components/PageSidebar.astro",
         Pagination: "starlight-theme-obsidian/overrides/Pagination.astro",
         ThemeSelect: "starlight-theme-obsidian/overrides/ThemeSelect.astro",

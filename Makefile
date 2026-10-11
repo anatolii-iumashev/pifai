@@ -13,6 +13,9 @@ deploy: # Build and deploy to GitHub Pages
 dev:
 	npx astro dev
 
+dev-stop:
+	npx astro dev stop
+
 clean:
 	rm -rf dist
 	rm -rf .astro
