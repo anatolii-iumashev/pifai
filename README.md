@@ -80,6 +80,7 @@ pl-chat/
 - **[1. База и вводные](src/content/docs/basics/index.md)** — с чего начать, базовая психологическая грамотность
   - [Что такое психика](src/content/docs/basics/what-is-psyche.md) — сознание, бессознательное и модель Фрейда
   - [Эмоции и потребности](src/content/docs/basics/emotions-and-needs.md) — эмоциональная грамотность и 6 групп потребностей
+  - [Карма, самскары и свобода выбора](src/content/docs/basics/karma-and-samskara.md) — духовная модель повторяющихся побуждений и действий
 - **[2. Проблематика и Use cases](src/content/docs/use-cases/index.md)** — типовые запросы: тревога, депрессия, кризисы, отношения
   - [Тревога, страхи, фобии](src/content/docs/use-cases/anxiety-fears.md) — виды расстройств, КПТ, экспозиция
   - [Депрессия, апатия, выгорание](src/content/docs/use-cases/depression-burnout.md) — как различить и что делать
@@ -130,6 +131,7 @@ pl-chat/
   - [Интеграция подходов](src/content/docs/addons/integral/index.md)
   - [FAQ](src/content/docs/addons/faq/index.md)
   - [Queries](src/content/docs/addons/queries/index.md)
+- **[8. Глоссарий](src/content/docs/glossary/index.md)** — отдельные статьи по терминам школ и традиций
 
 ---
 ---

@@ -104,3 +104,14 @@ Chronological log of all wiki operations.
   - practices/yoga/hatha-yoga.md — асаны, пранаяма, связь тела и психики
 - Обновлены: practices/index.md (категория «Йога»), index.md, README.md
 - Бэклинки: use-cases/depression-burnout.md → карма-йога (профилактика выгорания)
+## [2026-10-11] ingest | Карма, самскары и глоссарий
+
+- Источник: raw/inbox/karma.md → raw/2026/1011/karma.md (лекция о карме)
+- Созданы: basics/karma-and-samskara.md, glossary/index.md и отдельные статьи терминов.
+- Обновлены: basics/index.md, addons/index.md, practices/yoga/karma-yoga.md, index.md, README.md
+- Добавлены ссылки между статьёй, глоссарием и статьёй о карма-йоге; метафизические утверждения источника обозначены как положения традиции.
+
+## [2026-10-11] update | Глоссарий как отдельный раздел
+
+- Перенесён из addons в самостоятельный раздел glossary/.
+- Каждый термин вынесен в отдельную страницу; обновлены каталоги и ссылки.
