@@ -25,27 +25,27 @@ export default defineConfig({
       description: "База знаний по психологии и философии. Чат-бот психотерапевт.",
       sidebar: [
         {
-          label: "1. База и вводные",
+          label: "База и вводные",
           collapsed: false,
           items: [{ autogenerate: { directory: "basics" } }],
         },
         {
-          label: "2. Проблематика и Use cases",
+          label: "Проблематика и Use cases",
           collapsed: true,
           items: [{ autogenerate: { directory: "use-cases" } }],
         },
         {
-          label: "3. Практики и техники",
+          label: "Практики и техники",
           collapsed: true,
           items: [{ autogenerate: { directory: "practices" } }],
         },
         {
-          label: "4. Цитаты великих людей",
+          label: "Цитаты великих людей",
           collapsed: true,
           items: [{ autogenerate: { directory: "quotes" } }],
         },
         {
-          label: "5. Авторы и школы",
+          label: "Авторы и школы",
           collapsed: true,
           items: [
             {
@@ -86,14 +86,19 @@ export default defineConfig({
           ],
         },
         {
-          label: "6. Классификация и типология",
+          label: "Классификация и типология",
           collapsed: true,
           items: [{ autogenerate: { directory: "typology" } }],
         },
         {
-          label: "7. Дополнения",
+          label: "Дополнения",
           collapsed: true,
           items: [{ autogenerate: { directory: "addons" } }],
+        },
+        {
+          label: "Глоссарий",
+          collapsed: true,
+          items: [{ autogenerate: { directory: "glossary" } }],
         },
       ],
 
@@ -107,7 +112,7 @@ export default defineConfig({
           attrs: {
             rel: "icon",
             type: "image/png",
-            href: "/favicon.png",
+            href: `${BASE.replace(/\/$/, "")}/yin-yang.png`,
           },
         },
       ],
