@@ -5,6 +5,8 @@ created: 2026-10-22
 ---
 # RFC: Перенос приёма Telegram-бота на Bunny Magic Container и перестройка консультации на LangGraph
 
+## todo
+
 - [ ] Hono-приложение в Bunny Magic Container заменяет Bunny Edge Script; консультация перестраивается на LangGraph-агенте (LangChain JS + OpenRouter) в задаче Trigger.dev.
 
 ## Вводные
