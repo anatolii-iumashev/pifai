@@ -1,0 +1,66 @@
+name: Services setup
+
+# One-off / corrective wiring that needs secrets never exposed to the chat:
+# - TELEGRAM_BOT_TOKEN from Actions secret -> Trigger.dev env
+# - TRIGGER_SECRET_KEY (prod key of the Trigger.dev project, tr_prod_sk_...) -> Bunny container env
+# - Optional: switch the prod Telegram webhook to the container endpoint.
+
+on:
+  workflow_dispatch:
+    inputs:
+      set_webhook:
+        description: 'Switch the Telegram webhook to the container endpoint (prod switch)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: services-setup
+  cancel-in-progress: false
+
+env:
+  TRIGGER_PROJECT_REF: proj_rfldgyqffeltidshyifn
+  WEBHOOK_APP_ID: AXg55OpMsJ6JwQR
+  WEBHOOK_CONTAINER_ID: AXg55OpMsJ6JwQR-0tuH
+  WEBHOOK_URL: https://mc-of7dlol10n.bunny.run
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Trigger.dev env: TELEGRAM_BOT_TOKEN
+        if: ${{ secrets.TELEGRAM_BOT_TOKEN != '' }}
+        run: |
+          npm install -g trigger.dev@4
+          npx trigger env set TELEGRAM_BOT_TOKEN "$TELEGRAM_BOT_TOKEN" -e prod --secret -p "$TRIGGER_PROJECT_REF"
+        env:
+          TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
+      - name: Bunny container env: TRIGGER_SECRET_KEY
+        if: ${{ secrets.PIFAI_TRIGGER_PROD_KEY != '' }}
+        run: |
+          curl -s -X PUT "https://api.bunny.net/mc/apps/$WEBHOOK_APP_ID/containers/$WEBHOOK_CONTAINER_ID/env" \
+            -H "AccessKey: $BUNNYNET_API_KEY" -H "Content-Type: application/json" \
+            -d '{"TELEGRAM_WEBHOOK_SECRET": "'"${{ secrets.PIFAI_TELEGRAM_WEBHOOK_SECRET }}"'", "TRIGGER_SECRET_KEY": "'"${{ secrets.PIFAI_TRIGGER_PROD_KEY }}"'", "TRIGGER_API_URL": "https://api.trigger.dev"}'
+        env:
+          BUNNYNET_API_KEY: ${{ secrets.BUNNYNET_API_KEY }}
+
+      - name: Switch Telegram webhook to the container
+        if: ${{ inputs.set_webhook == true }}
+        run: |
+          curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook" \
+            -d "url=$WEBHOOK_URL/webhook" \
+            -d "secret_token=$WEBHOOK_SECRET" \
+            -d "allowed_updates=[\"message\"]" > /dev/null
+          curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getWebhookInfo" | python3 -c 'import json,sys; info=json.load(sys.stdin)["result"]; print("url:", info.get("url")); print("pending:", info.get("pending_update_count")); print("error:", info.get("last_error_message"))'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          WEBHOOK_SECRET: ${{ secrets.PIFAI_TELEGRAM_WEBHOOK_SECRET }}

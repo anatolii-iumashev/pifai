@@ -132,6 +132,35 @@ created: 2026-10-22
 - ~~Сколько узлов и какие условные переходы включает граф на первой итерации~~ **Решено на delivery:** минимальный набор из 11 узлов: validate → load_history → plan_route (условный) → { answer_command, answer_crisis, agent ⇄ wiki_tools → assemble } → save_history → claim_delivery (условный) → send. Принцип «кризис до LLM, источники только из wiki» соблюдён.
 - Каков период наблюдения перед удалением Edge Script и утилизацией `includes/edge`? Предложение delivery: 14 дней после продового переключения; утверждается на переключении.
 
+## TODO деплоя (2026-10-22)
+
+### Сделано (без участия человека)
+
+- [x] **Контейнер приёма развёрнут в Bunny Magic Container:** приложение `pifai-webhook` (app id `AXg55OpMsJ6JwQR`, контейнер id `AXg55OpMsJ6JwQR-0tuH`), образ `ghcr.io/aiiddqd/pifai-webhook:20261022` (linux/amd64, собран podman, non-root, секреты только в env контейнера). Публичный эндпоинт: `https://mc-of7dlol10n.bunny.run` (CDN, pull zone `6845699`). Проверено на проде: `GET /health` → 200, `POST /webhook` без секрета → 401, неверный секрет → 401, `GET /webhook` → 405, прочие пути → 404.
+- [x] **Bunny Storage создан:** зона `pifai-dialogues` (id `2007933`, регион DE, хост `storage.bunnycdn.com`). Пароль зоны задан в GitHub секрет `PIFAI_STORAGE_ACCESS_KEY` и в env задачи Trigger.dev (`BUNNY_STORAGE_ZONE`/`BUNNY_STORAGE_ACCESS_KEY`/`BUNNY_STORAGE_HOST`, env prod).
+- [x] **Очистка истории:** у Bunny Storage нет нативных lifecycle-правил (отклонение от RFC, см. ниже) — вместо них `.github/workflows/storage-cleanup.yml` (cron ежедневно 02:30 UTC + вручную) запускает [scripts/storage-cleanup.mjs](../../scripts/storage-cleanup.mjs): удаляет объекты старше 7 дней в префиксе `pifai/`.
+- [x] **Модель задана:** `OPENROUTER_MODEL=deepseek/deepseek-pro-latest` в env prod Trigger.dev (выбор пользователя, «deepseek pro»).
+- [x] **Задача `consult-telegram` задеплоена:** версия `20261022.1` (LangGraph-агент, пакет знаний `1dee85f7b5f1342d`: 69 страниц + скилл), проект `proj_rfldgyqffeltidshyifn`, окружение prod.
+- [x] GitHub: переменная `WEBHOOK_APP_ID=AXg55OpMsJ6JwQR`; секреты `PIFAI_STORAGE_ACCESS_KEY`, `PIFAI_TELEGRAM_WEBHOOK_SECRET` (для переключения webhook), `TRIGGER_ACCESS_TOKEN` (для env-настройки через [services-setup.yml](../../.github/workflows/services-setup.yml)); `BUNNYNET_API_KEY` и `TELEGRAM_BOT_TOKEN` были.
+
+### Нужно от пользователя
+
+- [x] **Prod-ключ Trigger.dev** (`tr_prod_sk_…`) — добавлен в `.env`; env контейнера обновлён через API, постановка задачи проверена end-to-end (2026-10-22).
+- [ ] **Коммиты и пуш — только пользователь** (правило зафиксировано в [AGENTS.md](../../AGENTS.md)): закоммитить оставшиеся файлы (`services-setup.yml`, правки RFC/спеки/AGENTS.md), смержить PR #10 в main — workflow `workflow_dispatch` запускаются только с default-ветки.
+- [ ] **`TELEGRAM_BOT_TOKEN`** — остаётся только в GitHub-секрете (мне недоступен); попадёт в env задачи Trigger.dev через [services-setup.yml](../../.github/workflows/services-setup.yml) после мержа (шаг 3 ниже).
+
+### Последовательность после (выполняю я)
+
+1. ~~Prod-ключ из `.env` → env контейнера~~ **Сделано (2026-10-22):** `PUT /mc/apps/{appId}/containers/{containerId}/env` — `TRIGGER_SECRET_KEY=tr_prod_sk_…` на проде контейнера.
+2. ~~Проверка постановки~~ **Сделано (2026-10-22):** `POST /webhook` с секретом → 200; run `run_06gm4rvvvj6e84sgds6e4n9la2` (v`20261022.1`) прошёл валидацию, историю (Bunny Storage), вызов модели и упал ровно на отправке в Telegram — `TELEGRAM_BOT_TOKEN is required` (ожидаемо до шага 3).
+3. Запуск [services-setup.yml](../../.github/workflows/services-setup.yml) после мержа PR #10: `TELEGRAM_BOT_TOKEN` → env задачи, затем (по флагу `set_webhook`) `setWebhook` на `https://mc-of7dlol10n.bunny.run/webhook`.
+4. Сценарии из «Тест инструкции» шаг 5 на боте, закрытие чекбоксов продовой проверки, слепое сравнение.
+
+### Отклонения от RFC, найденные при деплое
+
+- **Bunny Storage не имеет lifecycle-правил** — вместо «включить lifecycle-очистку объектов старше 7 дней» сделана ежедневная cron-очистка через GitHub Actions ([storage-cleanup.yml](../../.github/workflows/storage-cleanup.yml)). Поведение то же: объекты истории и маркеров живут ≤ 7 дней.
+- **Registry-имя образа**: Bunny тянет только из подключённых registry — подключён приватный GitHub-registry namespace `aiiddqd`; первый деплой собран и запушен вручную (`ghcr.io/aiiddqd/pifai-webhook:20261022`). Workflow публикации пушит в namespace репозитория (`anatolii-iumashev`) — для его автоматических деплоев пакет делается публичным (один клик) либо в Bunny подключается второй registry.
+
 ## Материалы и источники
 
 - [RFC 260928: Bunny Edge Script + Trigger.dev + OpenRouter](260928-pifai-bunny-trigger-openrouter.md) — контракты задачи и переключения; его Postgres-схема здесь не используется

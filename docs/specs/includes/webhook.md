@@ -29,6 +29,16 @@ rfc: ../../rfc/261022-pifai-magic-container-langgraph.md
 - Приложение в Bunny создаётся один раз (образ из GHCR, health-check на `/health`); дальнейшие релизы — обновлением тега образа workflow.
 - Публичный hostname контейнера используется для `setWebhook` продового бота (порядок переключения и откат — [RFC 260928](../../rfc/260928-pifai-bunny-trigger-openrouter.md)).
 
+## Развёрнутое состояние (2026-10-22)
+
+- Приложение `pifai-webhook` в Bunny Magic Container, app id `AXg55OpMsJ6JwQR`, контейнер `webhook`, регион DE (единственный required), runtime `shared`, autoscaling 1–10.
+- Первый образ `ghcr.io/aiiddqd/pifai-webhook:20261022` собран и запушен вручную (podman, linux/amd64); в Bunny подключён приватный GitHub-registry namespace `aiiddqd` (registry id `10060`).
+- Эндпоинт: `https://mc-of7dlol10n.bunny.run` (CDN, pull zone `6845699`, SSL, container port 8080). Health-check платформы: readiness/liveness HTTP GET `/health:8080`.
+- Env контейнера: `TELEGRAM_WEBHOOK_SECRET` (сгенерирован, хранится локально в `.env` и в Bunny), `TRIGGER_SECRET_KEY` (плейсхолдер до предоставления ключа проекта Trigger.dev), `TRIGGER_API_URL=https://api.trigger.dev`.
+- Проверено на проде: `/health` 200, `POST /webhook` без/с неверным секретом 401, `GET /webhook` 405, прочие пути 404.
+- Очистка истории (Bunny Storage): ежедневный cron [storage-cleanup.yml](../../../.github/workflows/storage-cleanup.yml) → [storage-cleanup.mjs](../../../scripts/storage-cleanup.mjs); зона `pifai-dialogues` (id `2007933`, DE), пароль — GitHub секрет `PIFAI_STORAGE_ACCESS_KEY` + env задачи Trigger.dev. Нативных lifecycle у Bunny Storage нет.
+- Автоматические релизы (workflow пушит `ghcr.io/anatolii-iumashev/pifai-webhook`) заработают после того, как пакет станет публичным в GitHub UI либо в Bunny будет подключён второй registry; до этого — ручная сборка и `podman push` в namespace `aiiddqd` + обновление тега контейнера (PATCH через Magic Containers API).
+
 ## Команды
 
 Из корня репозитория:

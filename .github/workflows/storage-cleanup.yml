@@ -1,0 +1,31 @@
+name: Storage cleanup
+
+on:
+  schedule:
+    # Daily at 02:30 UTC — objects older than 7 days are removed.
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: storage-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Delete objects older than 7 days
+        run: node scripts/storage-cleanup.mjs
+        env:
+          BUNNY_STORAGE_HOST: storage.bunnycdn.com
+          BUNNY_STORAGE_ZONE: pifai-dialogues
+          BUNNY_STORAGE_ACCESS_KEY: ${{ secrets.PIFAI_STORAGE_ACCESS_KEY }}
+          CLEANUP_PREFIX: pifai
+          MAX_AGE_DAYS: 7
