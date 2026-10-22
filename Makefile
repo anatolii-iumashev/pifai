@@ -7,40 +7,30 @@ preview:
 	npx astro preview
 
 # === Deployment ===
-# Website: GitHub Actions (deploy.yml) on push to main.
-# Bot: webhook container via Actions (webhook-container.yml → GHCR → Bunny Magic Containers),
-#      Bunny edge script locally (BUNNY_API_KEY in .env, BUNNY_EDGE_SCRIPT_ID = gh variable list).
+# Pushes/commits are done manually by the user — Makefile commands run from the
+# current state only.
+# Website: local build via deploy-website; GitHub Actions (deploy.yml) publishes on push to main.
+# Bot: Bunny edge script locally (BUNNY_API_KEY in .env, BUNNY_EDGE_SCRIPT_ID = gh variable list);
+#      webhook container built by Actions (webhook-container.yml → GHCR → Bunny Magic Containers)
+#      on push to main / workflow_dispatch.
 # Trigger.dev task: published locally from includes/consult.
 
 BUNNY_EDGE_SCRIPT_ID ?= 92871
 
 deploy: deploy-website deploy-trigger deploy-bot # Deploy everything: website, Trigger.dev task, bot
 
-deploy-website: # Website → GitHub Pages: verify locally, push main, Actions publishes
-	@branch=$$(git branch --show-current); \
-	if [ "$$branch" != "main" ]; then echo "❌ Not on main ($$branch) — the site deploys from main"; exit 1; fi; \
-	if [ -n "$$(git status --porcelain)" ]; then echo "❌ Uncommitted changes — commit first"; exit 1; fi
+deploy-website: # Website → GitHub Pages: local build; after YOU push to main, Actions (deploy.yml) publishes
 	npx astro check
 	npx astro build
-	git pull --rebase origin main
-	git push origin main
-	@sleep 3; \
-	run_id=$$(gh run list --workflow=deploy.yml --limit 1 --json databaseId --jq '.[0].databaseId'); \
-	echo "✅ Pushed to main — deploy.yml is building"; \
-	echo "   progress: gh run watch $$run_id --exit-status"
+	@echo "✅ Build ok — push main to deploy (Actions deploys on push to main)"
 
 deploy-trigger: # Trigger.dev: publish the consultation task (local)
 	cd includes/consult && npm ci && npm run build:wiki-pack && npm run deploy
 
-deploy-bot: # Bot: webhook container (Actions) + Bunny edge script (local)
-	gh workflow run webhook-container.yml --ref main
+deploy-bot: # Bot: Bunny edge script (local); webhook container builds via Actions on push to main
 	cd includes/edge && deno task check && deno task test && deno task build
 	cd includes/edge && BUNNYNET_API_KEY="$${BUNNYNET_API_KEY:-$$(sed -n 's/^BUNNY_API_KEY=//p' $(CURDIR)/.env)}" \
 		npx @bunny.net/cli scripts deploy dist/index.js "$(BUNNY_EDGE_SCRIPT_ID)"
-	@sleep 5; \
-	run_id=$$(gh run list --workflow=webhook-container.yml --limit 1 --json databaseId --jq '.[0].databaseId'); \
-	echo "Webhook container: watching run $$run_id"; \
-	gh run watch "$$run_id" --exit-status
 
 dev:
 	npx astro dev

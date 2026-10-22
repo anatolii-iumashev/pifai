@@ -1,6 +1,8 @@
 name: Webhook container
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -25,7 +27,6 @@ jobs:
         working-directory: includes/webhook
 
   deploy:
-    if: github.event_name == 'workflow_dispatch'
     needs: verify
     runs-on: ubuntu-latest
     permissions:
