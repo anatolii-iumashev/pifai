@@ -9,6 +9,7 @@ import type { WikiPack } from './wiki.js';
 import { wikiVersion } from './wiki.js';
 import { navigationInstructions, wikiTools, wikiToolNames, type LoadedSource, type WikiSources } from './tools.js';
 import { cleanModelText, crisisResponse, isCrisis, unavailableResponse } from './safety.js';
+import { composeQuotes } from './quotes.js';
 
 export type Route = 'command' | 'crisis' | 'consult';
 export type Command = 'start' | 'help' | 'clear';
@@ -150,10 +151,17 @@ export function buildConsultGraph(deps: Dependencies) {
     const last = state.messages.at(-1);
     const text = cleanModelText(textOf(last));
     const response = text || unavailableResponse;
-    let final = response;
     const unique = [...new Map(sources.loaded.map((source) => [source.url, source])).values()];
+    let final = response;
+    if (response !== unavailableResponse) {
+      // The model may deliver quotes in its own section; they are validated against
+      // the wiki pack and topped up from retrieval to 2–4 ("мысли великих на тему").
+      const composed = composeQuotes(deps.wiki, response, `${state.job!.text} ${unique.map((source) => source.title).join(' ')}`);
+      final = composed.answer;
+      if (composed.quotes) final += `\n\n${composed.quotes}`;
+    }
     if (unique.length && response !== unavailableResponse) {
-      final += '\n\nМатериалы базы знаний:\n' + unique.map((source) => `${source.title}: ${source.url}`).join('\n');
+      final += '\n\n## Материалы базы знаний\n' + unique.map((source) => `- [${source.title}](${source.url})`).join('\n');
     }
     const ai = state.messages.filter((message) => message instanceof AIMessage).at(-1) as AIMessage | undefined;
     deps.log?.({

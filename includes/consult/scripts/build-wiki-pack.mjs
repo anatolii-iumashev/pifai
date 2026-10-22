@@ -25,8 +25,10 @@ function toRoute(path) {
 
 // Quotes listed on a topic page through <QuoteList topic="..."/> are rendered at
 // site build time; the wiki pack inlines them so the agent reads the same content a visitor sees.
-function quoteLinesByTopic() {
+// The quotes collection also feeds the bot's own quote picker (quotes in the pack).
+function quoteCollection() {
   const byTopic = new Map();
+  const list = [];
   for (const file of walk(quotes).filter((file) => file.endsWith('.yaml'))) {
     const author = YAML.parse(readFileSync(file, 'utf8'));
     if (!author?.name || !Array.isArray(author.quotes)) throw new Error(`Invalid quotes: ${file}`);
@@ -36,9 +38,16 @@ function quoteLinesByTopic() {
         if (!byTopic.has(topic)) byTopic.set(topic, []);
         byTopic.get(topic).push(line);
       }
+      list.push({
+        author: author.name,
+        text: quote.text,
+        context: quote.context ?? '',
+        reflection: quote.reflection ?? '',
+        topics: quote.topics ?? [],
+      });
     }
   }
-  return byTopic;
+  return { byTopic, list };
 }
 
 function pageBody(raw, path, quotesByTopic) {
@@ -63,7 +72,7 @@ function pageBody(raw, path, quotesByTopic) {
   return { metadata, body };
 }
 
-const quotesByTopic = quoteLinesByTopic();
+const { byTopic: quotesByTopic, list: quoteList } = quoteCollection();
 const pages = [];
 for (const file of walk(docs).filter((file) => /\.(md|mdx)$/.test(file))) {
   const path = relative(docs, file).replaceAll('\\', '/');
@@ -76,7 +85,7 @@ pages.sort((a, b) => a.path.localeCompare(b.path));
 
 const skill = readFileSync(skillPath, 'utf8').replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '').trim();
 if (!skill) throw new Error('Support skill is empty');
-const pack = { schemaVersion: 1, buildId: hash(JSON.stringify({ baseUrl, skill, pages })).slice(0, 16), createdAt: new Date().toISOString(), baseUrl, skill, pages };
+const pack = { schemaVersion: 1, buildId: hash(JSON.stringify({ baseUrl, skill, quotes: quoteList, pages })).slice(0, 16), createdAt: new Date().toISOString(), baseUrl, skill, quotes: quoteList, pages };
 mkdirSync(output, { recursive: true });
 writeFileSync(join(output, 'wiki-pack.json'), JSON.stringify(pack));
-process.stdout.write(`Wiki pack ${pack.buildId}: ${pages.length} pages, skill ${skill.length} chars\n`);
+process.stdout.write(`Wiki pack ${pack.buildId}: ${pages.length} pages, ${quoteList.length} quotes, skill ${skill.length} chars\n`);

@@ -8,5 +8,5 @@ export const unavailableResponse = 'Сейчас я не могу подгото
 
 export function cleanModelText(text: string): string {
   // All public references are appended from the index by the application.
-  return text.replace(/https?:\/\/\S+/gi, '').replace(/\n{3,}/g, '\n\n').trim();
+  return text.replace(/\[([^\]]*)\]\(https?:\/\/[^)]*\)/gi, '$1').replace(/https?:\/\/\S+/gi, '').replace(/\n{3,}/g, '\n\n').trim();
 }

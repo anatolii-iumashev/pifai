@@ -9,12 +9,21 @@ export interface WikiPage {
   content: string;
 }
 
+export interface PackQuote {
+  author: string;
+  text: string;
+  context: string;
+  reflection: string;
+  topics: string[];
+}
+
 export interface WikiPack {
   schemaVersion: 1;
   buildId: string;
   createdAt: string;
   baseUrl: string;
   skill: string;
+  quotes: PackQuote[];
   pages: WikiPage[];
 }
 

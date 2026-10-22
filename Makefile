@@ -1,4 +1,4 @@
-.PHONY: build preview deploy serve clean install check ingest query lint update faq images init
+.PHONY: build preview deploy deploy-website deploy-trigger deploy-bot serve clean install check ingest query lint update faq images init
 
 build:
 	npx astro build
@@ -6,9 +6,41 @@ build:
 preview:
 	npx astro preview
 
-deploy: # Build and deploy to GitHub Pages
-	make build
-	# Deploy is handled by GitHub Actions on push to main
+# === Deployment ===
+# Website: GitHub Actions (deploy.yml) on push to main.
+# Bot: webhook container via Actions (webhook-container.yml → GHCR → Bunny Magic Containers),
+#      Bunny edge script locally (BUNNY_API_KEY in .env, BUNNY_EDGE_SCRIPT_ID = gh variable list).
+# Trigger.dev task: published locally from includes/consult.
+
+BUNNY_EDGE_SCRIPT_ID ?= 92871
+
+deploy: deploy-website deploy-trigger deploy-bot # Deploy everything: website, Trigger.dev task, bot
+
+deploy-website: # Website → GitHub Pages: verify locally, push main, Actions publishes
+	@branch=$$(git branch --show-current); \
+	if [ "$$branch" != "main" ]; then echo "❌ Not on main ($$branch) — the site deploys from main"; exit 1; fi; \
+	if [ -n "$$(git status --porcelain)" ]; then echo "❌ Uncommitted changes — commit first"; exit 1; fi
+	npx astro check
+	npx astro build
+	git pull --rebase origin main
+	git push origin main
+	@sleep 3; \
+	run_id=$$(gh run list --workflow=deploy.yml --limit 1 --json databaseId --jq '.[0].databaseId'); \
+	echo "✅ Pushed to main — deploy.yml is building"; \
+	echo "   progress: gh run watch $$run_id --exit-status"
+
+deploy-trigger: # Trigger.dev: publish the consultation task (local)
+	cd includes/consult && npm ci && npm run build:wiki-pack && npm run deploy
+
+deploy-bot: # Bot: webhook container (Actions) + Bunny edge script (local)
+	gh workflow run webhook-container.yml --ref main
+	cd includes/edge && deno task check && deno task test && deno task build
+	cd includes/edge && BUNNYNET_API_KEY="$${BUNNYNET_API_KEY:-$$(sed -n 's/^BUNNY_API_KEY=//p' $(CURDIR)/.env)}" \
+		npx @bunny.net/cli scripts deploy dist/index.js "$(BUNNY_EDGE_SCRIPT_ID)"
+	@sleep 5; \
+	run_id=$$(gh run list --workflow=webhook-container.yml --limit 1 --json databaseId --jq '.[0].databaseId'); \
+	echo "Webhook container: watching run $$run_id"; \
+	gh run watch "$$run_id" --exit-status
 
 dev:
 	npx astro dev
@@ -78,17 +110,11 @@ webhook-test: # Local tests of the webhook container (includes/webhook)
 webhook-image: # Build the container image (no secrets are baked in)
 	cd includes/webhook && docker build --platform linux/amd64 -t pifai-webhook:local .
 
-webhook-deploy: # Publish the container via GitHub Actions (manual workflow, then Bunny rolling update)
-	gh workflow run webhook-container.yml --ref main && sleep 5 && gh run list --workflow=webhook-container.yml --limit 1
-
 consult-test: # Local tests of the consultation task (includes/consult)
 	cd includes/consult && npm ci && npm run check && npm test
 
 consult-eval: # Recall@3 evaluation of the wiki navigation on the fixed question set
 	cd includes/consult && npm ci && npm run eval
-
-consult-deploy: # Publish the consultation task to Trigger.dev (requires TRIGGER_ACCESS_TOKEN / TRIGGER_PROJECT_REF)
-	cd includes/consult && npm ci && npm run build:wiki-pack && npm run deploy
 
 bot-test: webhook-test consult-test # All bot-related local tests
 

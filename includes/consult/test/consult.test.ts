@@ -6,7 +6,7 @@ import packJson from '../generated/wiki-pack.json' with { type: 'json' };
 import { ackMessage, processConsultation, type Dependencies } from '../src/graph.js';
 import type { DialogueStore, HistoryMessage } from '../src/storage.js';
 import type { ConsultationJob } from '../src/types.js';
-import type { WikiPack } from '../src/wiki.js';
+import type { PackQuote, WikiPack } from '../src/wiki.js';
 
 const wiki = packJson as WikiPack;
 
@@ -72,6 +72,27 @@ test('consults through wiki tools with a thinking ack replaced by the answer', a
   assert.match(sends[0].text, /Материалы базы знаний/);
   assert.doesNotMatch(sends[0].text, /invented\.invalid/);
   assert.deepEqual(calls.saved, [{ chatId: 42, user: 'Я тревожусь', response: sends[0].text }]);
+});
+
+test('model quotes are validated against the pack and topped up by retrieval', async () => {
+  const packQuote: PackQuote = { author: 'Эпиктет', text: 'Не вещи расстраивают нас, а представления о вещах.', context: '', reflection: '', topics: [] };
+  const localWiki: WikiPack = { ...wiki, quotes: [packQuote] };
+  const { deps, model, sends, calls } = fixture();
+  deps.wiki = localWiki;
+  const invented = 'Придуманная цитата, которой в базе никогда не было и не будет.';
+  model
+    .respondWithTools([{ name: 'read_wiki_page', args: { path: 'authors/rosenberg/4-components.md' } }])
+    .respond(new AIMessage(`Ответ.\n\n## Мысли великих\n\n> «${invented}»\n> — **Никто Нибудь**`));
+  const question: ConsultationJob = { ...job, text: 'Я расстраиваюсь из-за вещей и представлений о них' };
+  assert.deepEqual(await processConsultation(question, deps), { status: 'delivered' });
+  const final = sends.at(-1)!.text;
+  const quoteSection = final.slice(final.indexOf('## Мысли великих'), final.indexOf('## Материалы базы знаний'));
+  assert.doesNotMatch(quoteSection, new RegExp(invented));
+  assert.doesNotMatch(quoteSection, /Никто Нибудь/);
+  assert.match(quoteSection, /Эпиктет/);
+  assert.match(quoteSection, /«Не вещи расстраивают нас, а представления о вещах\.»/);
+  assert.match(final, /## Материалы базы знаний/);
+  assert.deepEqual(calls.saved, [{ chatId: 42, user: question.text, response: final }]);
 });
 
 test('search_wiki finds pages without attaching sources', async () => {
