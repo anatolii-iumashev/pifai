@@ -56,6 +56,7 @@ created: 2026-10-22
 - Magic Container: приложение из п. 1 собирается в Docker-образ, публикуется в Bunny вручную через workflow; секреты задаются в окружении контейнера. Проверка на тестовом боте до продового переключения.
 - Продовый `setWebhook` существующего бота переводится с Edge Script URL на URL контейнера с `secret_token`, без `drop_pending_updates`; Edge Script при этом отключается (Bunny dashboard / API), код `includes/edge` остаётся в репозитории до завершения наблюдения.
 - Откат: вернуть webhook на Edge Script URL тем же `setWebhook` (Edge Script не удаляется, только отключён) до конца периода наблюдения. Затем — удалить Edge Script и зафиксировать в спецификациях новое состояние (`docs/specs/includes/`: edge.md выводится, webhook-часть описывается в новом spec).
+  > **Историческое (2026-10-22):** период наблюдения не проводился — Edge Script 92871 (и его pull zone) удалён, `includes/edge` удалён из репозитория; эксплуатационный откат на Edge Script невозможен. См. [RFC утилизации](261022-pifai-cleanup-deno-wrangler.md).
 - Trigger.dev: существующий проект и проектный ключ для контейнера сохраняются; при необходимости выдаётся отдельный ключ с доступом только к запуску `consult-telegram`.
 
 ## Критерии приёмки
@@ -76,7 +77,7 @@ created: 2026-10-22
 - [x] Проверены 401 без секретного заголовка, 405 для метода, 503 при сбое Trigger.dev (тестом с выключенным ключом), повтор update и последовательность двух сообщений одного чата.
 - [ ] Проверены `/start`, `/help`, `/clear`, обычный вопрос, follow-up, вопрос вне базы, кризис, длинный ответ и неопределённая доставка на тестовом боте; ответы соответствуют принципам скилла поддержки (ННО: без диагнозов и оценок собеседника, эмпатичная формулировка).
 - [ ] Слепое сравнение минимум 30 ответов со старым ботом: не менее 70% не хуже и не менее 50% лучше; критических ошибок на кризисном наборе нет.
-- [x] Продовый webhook переведён на контейнер (`getWebhookInfo`: `https://mc-of7dlol10n.bunny.run/webhook`); откат — `setWebhook` на `https://pif-bot.evgrezanov.workers.dev/webhook` (Edge Script не отключён).
+- [x] Продовый webhook переведён на контейнер (`getWebhookInfo`: `https://mc-of7dlol10n.bunny.run/webhook`). Исторический план отката через Edge Script (`pif-bot.evgrezanov.workers.dev`) более не действует — скрипт удалён 2026-10-22.
 
 
 
@@ -130,7 +131,7 @@ created: 2026-10-22
 - Какую модель OpenRouter выбрать после сравнительной оценки — переносится из RFC 260928.
 - Кто утверждает кризисный ответ и контакты помощи — переносится из RFC 260928.
 - ~~Сколько узлов и какие условные переходы включает граф на первой итерации~~ **Решено на delivery:** минимальный набор из 11 узлов: validate → load_history → plan_route (условный) → { answer_command, answer_crisis, agent ⇄ wiki_tools → assemble } → save_history → claim_delivery (условный) → send. Принцип «кризис до LLM, источники только из wiki» соблюдён.
-- Каков период наблюдения перед удалением Edge Script и утилизацией `includes/edge`? Предложение delivery: 14 дней после продового переключения; утверждается на переключении.
+- ~~Каков период наблюдения перед удалением Edge Script и утилизацией `includes/edge`?~~ **Решено (2026-10-22):** утилизация без периода наблюдения — пользователь принял решение убрать остатки сразу. Edge Script 92871 (вместе с его pull zone) и каталоги `includes/edge`/`includes/bot` удалены; откат на Edge Script невозможен. Детали — [RFC утилизации](261022-pifai-cleanup-deno-wrangler.md).
 
 ## TODO деплоя (2026-10-22)
 
@@ -173,4 +174,4 @@ created: 2026-10-22
 - [LangChain JS](https://js.langchain.com/) / [LangGraph JS](https://langchain-ai.github.io/langgraphjs/)
 - [OpenRouter: Chat Completions](https://openrouter.ai/docs/quickstart)
 - [Telegram Bot API](https://core.telegram.org/bots/api)
-- Спецификации: [edge](../specs/includes/edge.md), [consult](../specs/includes/consult.md)
+- Спецификации: [consult](../specs/includes/consult.md), [webhook](../specs/includes/webhook.md)

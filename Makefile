@@ -1,4 +1,4 @@
-.PHONY: build preview deploy deploy-website deploy-trigger deploy-bot serve clean install check ingest query lint update faq images init
+.PHONY: build preview deploy deploy-website deploy-trigger serve clean install check ingest query lint update faq images init
 
 build:
 	npx astro build
@@ -7,30 +7,22 @@ preview:
 	npx astro preview
 
 # === Deployment ===
-# Pushes/commits are done manually by the user — Makefile commands run from the
-# current state only.
-# Website: local build via deploy-website; GitHub Actions (deploy.yml) publishes on push to main.
-# Bot: Bunny edge script locally (BUNNY_API_KEY in .env, BUNNY_EDGE_SCRIPT_ID = gh variable list);
-#      webhook container built by Actions (webhook-container.yml → GHCR → Bunny Magic Containers)
+# make deploy = deploy from the CURRENT branch (any branch): HEAD goes to main,
+# deploy.yml publishes GitHub Pages. Git flow around main is the user's business.
+# Bot webhook container: built by Actions (webhook-container.yml → GHCR → Bunny Magic Containers)
 #      on push to main / workflow_dispatch.
 # Trigger.dev task: published locally from includes/consult.
 
-BUNNY_EDGE_SCRIPT_ID ?= 92871
+deploy: deploy-website deploy-trigger # Deploy everything: website, Trigger.dev task
 
-deploy: deploy-website deploy-trigger deploy-bot # Deploy everything: website, Trigger.dev task, bot
-
-deploy-website: # Website → GitHub Pages: local build; after YOU push to main, Actions (deploy.yml) publishes
+deploy-website: # Website → GitHub Pages: verify locally, deploy current branch (push HEAD → main)
 	npx astro check
 	npx astro build
-	@echo "✅ Build ok — push main to deploy (Actions deploys on push to main)"
+	git push origin HEAD:main
+	@echo "✅ HEAD → origin/main — deploy.yml is building (gh run watch)"
 
 deploy-trigger: # Trigger.dev: publish the consultation task (local)
 	cd includes/consult && npm ci && npm run build:wiki-pack && npm run deploy
-
-deploy-bot: # Bot: Bunny edge script (local); webhook container builds via Actions on push to main
-	cd includes/edge && deno task check && deno task test && deno task build
-	cd includes/edge && BUNNYNET_API_KEY="$${BUNNYNET_API_KEY:-$$(sed -n 's/^BUNNY_API_KEY=//p' $(CURDIR)/.env)}" \
-		npx @bunny.net/cli scripts deploy dist/index.js "$(BUNNY_EDGE_SCRIPT_ID)"
 
 dev:
 	npx astro dev

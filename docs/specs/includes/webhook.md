@@ -7,9 +7,9 @@ rfc: ../../rfc/261022-pifai-magic-container-langgraph.md
 
 # Spec: Webhook — Hono-приёмник Telegram-обновлений
 
-`includes/webhook` — Node.js LTS + Hono + TypeScript, публикуется как Docker-образ в Bunny Magic Container. Заменяет Bunny Edge Script (см. [edge](./edge.md), выводится из эксплуатации): принимает `POST /webhook`, проверяет секретный заголовок Telegram и ставит личные текстовые сообщения в задачу `consult-telegram` на Trigger.dev. `GET /health` — для health-check платформы. В контейнере нет токена бота, ключа OpenRouter, БД и wiki — только секреты приёма и переменные Trigger.dev.
+`includes/webhook` — Node.js LTS + Hono + TypeScript, публикуется как Docker-образ в Bunny Magic Container. Заменил Deno Edge Script 92871 (удалён 2026-10-22 вместе с pull zone и `includes/edge`; решение — [RFC утилизации](../../rfc/261022-pifai-cleanup-deno-wrangler.md)): принимает `POST /webhook`, проверяет секретный заголовок Telegram и ставит личные текстовые сообщения в задачу `consult-telegram` на Trigger.dev. `GET /health` — для health-check платформы. В контейнере нет токена бота, ключа OpenRouter, БД и wiki — только секреты приёма и переменные Trigger.dev.
 
-## Контракт (наследован от Edge Script)
+## Контракт приёма
 
 - `POST /webhook`: проверка `X-Telegram-Bot-Api-Secret-Token` до чтения тела; 401 без/с неверным секретом; лимит тела 16 KiB (объявленный `Content-Length` и поток), 413; 400 для malformed payload; 200 «Ignored» для групп, медиа и не-текстовых сообщений без постановки задачи; 405 для других методов, 404 для остальных путей.
 - Из update создаётся `ConsultationJob` версии 1 (`updateId`, `chatId`, `messageId`, `userId`, `text`, `receivedAt`) и ставится в Trigger.dev REST-вызовом `POST /api/v1/tasks/consult-telegram/trigger` с `idempotencyKey: pifai:tg:<updateId>` (TTL 7 дней) и `concurrencyKey: <chatId>`.

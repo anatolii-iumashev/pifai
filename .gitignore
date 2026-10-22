@@ -7,7 +7,6 @@ dist
 .cache/
 .astro
 .bunny/
-.wrangler/
 .trigger/
 includes/consult/generated/
 
