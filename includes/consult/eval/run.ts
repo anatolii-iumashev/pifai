@@ -5,7 +5,9 @@ import { isCrisis } from '../src/safety.js';
 // Deterministic evaluation of the LLM Wiki navigation floor: the lexical
 // page search the agent gets as the `search_wiki` tool must keep recall@3
 // on the fixed question set. The agent's own page choices are measured by
-// the blind comparison against the old bot (RFC 260928 criteria).
+// the blind comparison against the pre-migration answers (RFC 260928
+// criteria, historical baseline — there is a single bot now: Bunny Magic
+// Container + Trigger.dev task in `includes/consult`).
 let hits = 0;
 let relevant = 0;
 for (const item of questions) {
