@@ -137,27 +137,27 @@ pl-chat/
 ---
 ## 🤖 Чат-бот (Telegram)
 
-Сайт и база знаний публикуются на GitHub Pages. Новая версия Telegram-бота построена на **Bunny Edge Scripting → Trigger.dev → OpenRouter**; продовый webhook пока остаётся на старом Cloudflare Worker до проверки новой цепочки.
+Сайт и база знаний публикуются на GitHub Pages. Новая версия Telegram-бота построена на **Bunny Magic Container (Hono) → Trigger.dev (LangGraph-агент) → OpenRouter**; продовый webhook ещё не переключён — принимающий Edge Script и прежний Cloudflare Worker остаются как откат.
 
 ### Архитектура
 
 ```
-includes/edge/                # Bunny standalone Edge Script: Telegram webhook
-includes/consult/             # Trigger.dev задача, OpenRouter, Postgres, поиск по wiki
-  ├── migrations/001_dialogues.sql
-  ├── scripts/build-knowledge.mjs
+includes/webhook/             # Node.js + Hono в Bunny Magic Container: Telegram webhook
+includes/consult/             # Trigger.dev задача: LangGraph-агент, OpenRouter, история в Bunny Storage
+  ├── scripts/build-wiki-pack.mjs
   ├── src/trigger/consult-telegram.ts
   └── eval/questions.json
+includes/edge/                # Bunny Edge Script: выводится из эксплуатации (откат до переключения)
 includes/bot/                 # Прежний Cloudflare Worker для отката
 includes/landing/             # Отдельная посадочная страница
 ```
 
 ### Ключевые особенности
 
-- **Webhook**: Bunny проверяет секрет Telegram и ставит задачу в Trigger.dev; консультация не выполняется на границе.
-- **Знания**: при деплое Trigger.dev собирается индекс из wiki и YAML-цитат. Ссылки ведут на прежний GitHub Pages URL (`https://anatolii-iumashev.github.io/pifai/...`).
-- **История**: Postgres хранит 20 последних сообщений чата не дольше семи дней; при неопределённой доставке повторная отправка блокируется.
-- **Проверка и развёртывание**: [RFC миграции](docs/rfc/260928-pifai-bunny-trigger-openrouter.md) содержит команды тестов, окружения и порядок переключения webhook.
+- **Webhook**: контейнер проверяет секрет Telegram и ставит задачу в Trigger.dev; консультация не выполняется на границе. В контейнере нет токена бота, ключа OpenRouter, БД и wiki.
+- **Знания**: паттерн LLM Wiki — пакет знаний (страницы wiki + скилл поддержки) собирается в задачу при деплое; агент навигирует по карте разделов инструментами `search_wiki` / `read_wiki_page`. Ссылки ведут на GitHub Pages.
+- **История**: Bunny Storage хранит 20 последних сообщений чата (объекты старше 7 дней удаляет lifecycle-бакета); маркер доставки, записанный до отправки, блокирует повторную отправку.
+- **Проверка и развёртывание**: `make bot-test`, `make consult-eval`, `make webhook-image`; порядок переключения webhook — в [RFC миграции](docs/rfc/261022-pifai-magic-container-langgraph.md) и [RFC 260928](docs/rfc/260928-pifai-bunny-trigger-openrouter.md).
 
 ### Быстрый старт
 

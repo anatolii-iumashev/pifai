@@ -1,5 +1,7 @@
 # Edge: Telegram webhook
 
+> **Статус: выводится из эксплуатации** (переключение продового webhook на контейнер ещё не выполнено). Заменяется приложением [webhook](./webhook.md) в Bunny Magic Container; после продового переключения и периода наблюдения (предложение — 14 дней, см. [RFC 261022](../../rfc/261022-pifai-magic-container-langgraph.md)) Edge Script отключается и удаляется, код `includes/edge` утилизируется. До переключения остаётся рабочим приёмником webhook и остаётся в workflow деплоя.
+
 `includes/edge` — самостоятельный Bunny Edge Script на Deno/JavaScript. Он принимает `POST /webhook`, проверяет секретный заголовок Telegram и передаёт личные текстовые сообщения в задачу `consult-telegram` на Trigger.dev. `GET /health` возвращает состояние HTTP-обработчика. Консультация и обращение к модели здесь не выполняются.
 
 Основные файлы: [обработчик](../../../includes/edge/src/handler.ts), [точка входа](../../../includes/edge/src/index.ts), [тесты](../../../includes/edge/test/handler.test.ts). Для работы в Bunny нужны секреты `TELEGRAM_WEBHOOK_SECRET` и `TRIGGER_SECRET_KEY`.

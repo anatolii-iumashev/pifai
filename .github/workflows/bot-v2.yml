@@ -36,10 +36,12 @@ jobs:
       - run: npm ci && npm run test:rag
       - run: deno task check && deno task test && deno task build
         working-directory: includes/edge
+      - run: npm ci && npm run check && npm test && npm run eval
+        working-directory: includes/consult
       - run: npm ci
-        working-directory: includes/consult
-      - run: npm run check && npm test && npm run eval:retrieval
-        working-directory: includes/consult
+        working-directory: includes/webhook
+      - run: npm run check && npm test
+        working-directory: includes/webhook
 
   deploy:
     if: github.event_name == 'workflow_dispatch'
@@ -59,11 +61,10 @@ jobs:
         working-directory: includes/consult
       - name: Deploy consultation task
         run: |
-          node -e 'fetch(`${process.env.RAG_INDEX_SOURCE}/manifest.json`).then(r => r.json()).then(m => { if (!m.buildId?.startsWith(process.env.GITHUB_SHA)) throw new Error("Wiki RAG artifact does not match this commit"); console.log(`Wiki RAG ${m.buildId}`); })'
+          npm run build:wiki-pack
           npm run deploy -- --external-id ${{ github.sha }}
         working-directory: includes/consult
         env:
-          RAG_INDEX_SOURCE: ${{ vars.RAG_INDEX_SOURCE || 'https://anatolii-iumashev.github.io/pifai/rag' }}
           TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
           TRIGGER_PROJECT_REF: ${{ vars.TRIGGER_PROJECT_REF }}
       - run: deno task build

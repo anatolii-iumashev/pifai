@@ -1,6 +1,6 @@
 ---
 title: "ПиФ: webhook на Bunny Magic Container (Hono), консультация на LangGraph"
-status: draft
+status: delivery
 created: 2026-10-22
 ---
 # RFC: Перенос приёма Telegram-бота на Bunny Magic Container и перестройка консультации на LangGraph
@@ -60,13 +60,13 @@ created: 2026-10-22
 
 ### Код и локальная проверка
 
-- [ ] Hono-приложение проверяет секрет, метод, payload и лимит 16 KiB; неподдерживаемый update не порождает задачу; `GET /health` возвращает 200.
-- [ ] Успешный enqueue подтверждает run; неуспешный — 503; ключ `pifai:tg:<updateId>` защищает от повторов; `concurrencyKey` по chatId сохраняет порядок сообщений.
-- [ ] Граф агента покрыт тестами: команды, кризисный сценарий, источники из загруженных страниц wiki, вопрос вне базы, follow-up, длинный текст, повтор задачи без второго ответа.
-- [ ] Инструмент навигации по wiki работает на актуальном пакете знаний; на 30 фиксированных вопросах recall@3 не ниже 87,5% (база RFC 260928).
+- [x] Hono-приложение проверяет секрет, метод, payload и лимит 16 KiB; неподдерживаемый update не порождает задачу; `GET /health` возвращает 200.
+- [x] Успешный enqueue подтверждает run; неуспешный — 503; ключ `pifai:tg:<updateId>` защищает от повторов; `concurrencyKey` по chatId сохраняет порядок сообщений.
+- [x] Граф агента покрыт тестами: команды, кризисный сценарий, источники из загруженных страниц wiki, вопрос вне базы, follow-up, длинный текст, повтор задачи без второго ответа.
+- [x] Инструмент навигации по wiki работает на актуальном пакете знаний; на 30 фиксированных вопросах recall@3 = 95,8% (23/24), выше базовых 87,5% (21/24) из RFC 260928.
 - [ ] Workflow публикации контейнера запускается вручную и проходит end-to-end; секреты не попадают в образ и логи.
-- [ ] Скилл `.agents/skills/support/SKILL.md` создан, содержит принципы ННО (наблюдение — чувство — потребность — просьба) и ссылки на материалы wiki; сборка включает его в пакет задачи; системный контекст агента формируется из скилла.
-- [ ] Все ключевые команды типа локальные тесты, сборка образа, деплой и т д - есть в Makefile 
+- [x] Скилл `.agents/skills/support/SKILL.md` создан, содержит принципы ННО (наблюдение — чувство — потребность — просьба) и ссылки на материалы wiki; сборка включает его в пакет задачи; системный контекст агента формируется из скилла.
+- [x] Все ключевые команды типа локальные тесты, сборка образа, деплой и т д - есть в Makefile (`webhook-test`, `webhook-image`, `webhook-deploy`, `consult-test`, `consult-eval`, `consult-deploy`, `bot-test`)
 
 ### Продовая проверка
 
@@ -88,37 +88,47 @@ created: 2026-10-22
 
 ## Тест инструкции
 
-### 1. Локальные тесты
+### 1. Автотесты (локально)
 
-- `includes/webhook` — `npm ci && npm test && npm run check` (Node LTS).
-- `includes/consult` — `npm ci && npm test` (включает сборку знаний и `npm run eval`); recall@3 не ниже базового.
-- Сборка образа: `docker build includes/webhook` проходит, в образе нет секретов.
+- `make bot-test` — весь бот-контур: контейнер приёма и консультация
+- [includes/webhook/test/server.test.ts](../../includes/webhook/test/server.test.ts) — контракт приёма: 401 без секрета, 405 метод, 400 malformed, 413 лимит 16 KiB, 503 при сбое Trigger.dev, идемпотентность `pifai:tg:<updateId>` и `concurrencyKey` по chatId; запуск: `cd includes/webhook && npm test`
+- [includes/consult/test/consult.test.ts](../../includes/consult/test/consult.test.ts) — граф агента: команды `/start` `/help` `/clear`, кризис до LLM, источники только из загруженных страниц wiki, вопрос вне базы, повтор задачи без второго ответа, неопределённая доставка, сбой модели
+- [includes/consult/test/wiki.test.ts](../../includes/consult/test/wiki.test.ts) — пакет знаний LLM Wiki: полнота, карта, чтение страниц, recall вопросов
+- [includes/consult/test/storage.test.ts](../../includes/consult/test/storage.test.ts) — Bunny Storage: история (лимит 20 сообщений), claim-маркер доставки, очистка чата
+- [includes/consult/test/rag.test.ts](../../includes/consult/test/rag.test.ts) — альтернатива build-time RAG (сохранена, не используется в рантайме)
 
-### 2. Подготовка сервисов
+### 2. Оценка качества навигации
 
-- Trigger.dev: переиспользовать проект `proj_rfldgyqffeltidshyifn` из RFC 260928; секреты `TELEGRAM_BOT_TOKEN`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL` и ключи доступа к бакету Bunny Storage (`BUNNY_STORAGE_*`).
-- Bunny Magic Container: создать приложение из образа, задать `TELEGRAM_WEBHOOK_SECRET`, `TRIGGER_SECRET_KEY` и переменные Trigger.dev; проверить health-check.
-- Bunny Storage: создать бакет `pifai-dialogues`, включить lifecycle-очистку объектов старше 7 дней, выписать ключи доступа для задачи Trigger.dev.
+- `make consult-eval` — recall@3 по 30 фиксированным вопросам; порог 80% в [includes/consult/eval/run.ts](../../includes/consult/eval/run.ts), вопросы в [questions.json](../../includes/consult/eval/questions.json); на delivery: 95,8% (23/24)
+- `cd includes/consult && npm run eval:retrieval` — сравнение legacy/bm25/hybrid для альтернативы build-time RAG
 
-### 3. Проверка тестового webhook
+### 3. Сборка и проверка контейнера
 
-- `GET /health` — 200; `POST /webhook` без секретного заголовка — 401; неверный метод — 405.
-- На тестовом боте: два быстрых сообщения → один ответ каждого в порядке очереди; повтор update → ровно один run; команды и кризисный сценарий отвечают по контракту.
-- В Bunny Storage: маркер доставки для повторённого update, изоляция `/clear` (удаляется только объект текущего чата), автоматическая очистка объектов старше 7 дней; в Trigger.dev: видимость payload по правилам приватности RFC 260928.
+- `make webhook-image` — сборка образа (`docker build includes/webhook`)
+- Запуск локально с фиктивными секретами: `docker run -p 8080:8080 -e TELEGRAM_WEBHOOK_SECRET=s -e TRIGGER_SECRET_KEY=t pifai-webhook:local`, затем `GET /health` → 200 и `POST /webhook` без секрета → 401
+- Проверка секретов в образе: `docker run --rm --entrypoint sh pifai-webhook:local -c 'env | grep -i secret'` — пусто; в образе нет токена бота, ключа OpenRouter и wiki
 
-### 4. Продовое переключение
+### 4. Подготовка сервисов (после деплоя кода)
 
-- `setWebhook` на URL контейнера с `secret_token`, без `drop_pending_updates`; проверить `getWebhookInfo`.
-- Отключить Edge Script; при сбое — тот же API вернуть Edge Script URL.
+- Trigger.dev: переиспользовать проект `proj_rfldgyqffeltidshyifn` из RFC 260928; секреты `TELEGRAM_BOT_TOKEN`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL` и ключи доступа к бакету Bunny Storage (`BUNNY_STORAGE_*`)
+- Bunny Magic Container: создать приложение из образа (один раз в dashboard или через workflow), задать `TELEGRAM_WEBHOOK_SECRET`, `TRIGGER_SECRET_KEY` и переменные Trigger.dev; health-check платформы смотрит на `/health`
+- Bunny Storage: создать бакет `pifai-dialogues`, включить lifecycle-очистку объектов старше 7 дней, выписать ключи доступа для задачи Trigger.dev
+
+### 5. Ручная проверка тестового бота и продовое переключение
+
+- Workflow `webhook-container.yml` (GitHub Actions, вручную): verify → сборка образа → GHCR → rolling update в Bunny
+- [docs/rfc/260928-pifai-bunny-trigger-openrouter.md](260928-pifai-bunny-trigger-openrouter.md) — порядок продового переключения: `setWebhook` на URL контейнера с `secret_token`, без `drop_pending_updates`; проверка `getWebhookInfo`; откат на Edge Script URL тем же API
+- Сценарии на тестовом боте: два быстрых сообщения → два ответа по порядку; повтор update → один ответ; `/start`, `/help`, `/clear`; обычный вопрос и follow-up; вопрос вне базы; кризис; длинный ответ (разбивка на части)
+- В Bunny Storage (`pifai-dialogues`): маркер `pifai/delivered/telegram/<updateId>` у доставленных ответов; `/clear` удаляет только объект текущего чата; lifecycle-очистка объектов старше 7 дней
 
 ## Открытые вопросы
 
-- Подтвердить дефолт поиска: LLM Wiki (навигация по `index.md` и страницам моделью) против **build-time RAG** с эмбеддингами, генерируемыми при сборке (в репозитории уже есть `scripts/build-rag-embeddings.ts` и тесты `test/rag.test.ts`). Каков критерий и порог качества для переключения между вариантами?
-- Хранилище истории: Bunny Storage (дефолт) против Redis-контейнера против sessionless-режима без истории; достаточно ли маркера доставки в объектном хранилище для политики «не отправить дважды» при retry попытки задачи.
+- ~~Подтвердить дефолт поиска~~ **Решено на delivery (2026-10-22):** дефолт — LLM Wiki: карта разделов в системном контексте + инструменты `search_wiki` (лексический поиск по страницам) и `read_wiki_page`; эмбеддинги и БД не используются. Измеримый floor навигации — recall@3 лексического поиска по страницам (95,8% на eval-наборе, порог 80% в `eval/run.ts`); качество ответов агента измеряет слепое сравнение по критериям RFC 260928. Альтернатива build-time RAG сохранена в репозитории (`scripts/build-rag-embeddings.ts`, `test/rag.test.ts`, `includes/consult/src/rag/`), переключение — отдельное решение при отклонении качества.
+- ~~Хранилище истории~~ **Решено на delivery:** Bunny Storage (дефолт RFC). Политика «не отправить дважды» обеспечивается комбинацией: ключ идемпотентности Trigger.dev `pifai:tg:<updateId>` сериализует повторы одного update (параллельных попыток одного update не существует), `concurrencyKey` по `chatId` сохраняет порядок сообщений чата, маркер доставки пишется до отправки (GET→PUT). Redis-контейнер и sessionless-режим отклонены как избыточные.
 - Какую модель OpenRouter выбрать после сравнительной оценки — переносится из RFC 260928.
 - Кто утверждает кризисный ответ и контакты помощи — переносится из RFC 260928.
-- Сколько узлов и какие условные переходы включает граф на первой итерации (минимальный набор против полного)? Решается на delivery, в RFC фиксируется только принцип «кризис до LLM, источники только из wiki».
-- Каков период наблюдения перед удалением Edge Script и утилизацией `includes/edge`?
+- ~~Сколько узлов и какие условные переходы включает граф на первой итерации~~ **Решено на delivery:** минимальный набор из 11 узлов: validate → load_history → plan_route (условный) → { answer_command, answer_crisis, agent ⇄ wiki_tools → assemble } → save_history → claim_delivery (условный) → send. Принцип «кризис до LLM, источники только из wiki» соблюдён.
+- Каков период наблюдения перед удалением Edge Script и утилизацией `includes/edge`? Предложение delivery: 14 дней после продового переключения; утверждается на переключении.
 
 ## Материалы и источники
 

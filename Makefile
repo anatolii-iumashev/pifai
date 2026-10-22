@@ -70,6 +70,28 @@ init: # Initialize/repair wiki structure
 today:
 	@date +%Y/%m%d
 
+# === Bot: webhook container + consultation task (see docs/rfc/261022-pifai-magic-container-langgraph.md) ===
+
+webhook-test: # Local tests of the webhook container (includes/webhook)
+	cd includes/webhook && npm ci && npm run check && npm test
+
+webhook-image: # Build the container image (no secrets are baked in)
+	cd includes/webhook && docker build --platform linux/amd64 -t pifai-webhook:local .
+
+webhook-deploy: # Publish the container via GitHub Actions (manual workflow, then Bunny rolling update)
+	gh workflow run webhook-container.yml --ref main && sleep 5 && gh run list --workflow=webhook-container.yml --limit 1
+
+consult-test: # Local tests of the consultation task (includes/consult)
+	cd includes/consult && npm ci && npm run check && npm test
+
+consult-eval: # Recall@3 evaluation of the wiki navigation on the fixed question set
+	cd includes/consult && npm ci && npm run eval
+
+consult-deploy: # Publish the consultation task to Trigger.dev (requires TRIGGER_ACCESS_TOKEN / TRIGGER_PROJECT_REF)
+	cd includes/consult && npm ci && npm run build:wiki-pack && npm run deploy
+
+bot-test: webhook-test consult-test # All bot-related local tests
+
 status:
 	@echo "Wiki Status:"
 	@echo "============"
