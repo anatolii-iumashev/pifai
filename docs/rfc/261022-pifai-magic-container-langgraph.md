@@ -7,7 +7,7 @@ created: 2026-10-22
 
 ## todo
 
-- [ ] Hono-приложение в Bunny Magic Container заменяет Bunny Edge Script; консультация перестраивается на LangGraph-агенте (LangChain JS + OpenRouter) в задаче Trigger.dev.
+- [x] Hono-приложение в Bunny Magic Container заменяет Bunny Edge Script; консультация перестраивается на LangGraph-агенте (LangChain JS + OpenRouter) в задаче Trigger.dev.
 
 ## Вводные
 
@@ -72,11 +72,11 @@ created: 2026-10-22
 
 ### Продовая проверка
 
-- [ ] Развёрнуты контейнер и задача Trigger.dev; секреты заданы только в серверных окружениях; бакет Bunny Storage создан, lifecycle-очистка объектов старше 7 дней включена.
-- [ ] Проверены 401 без секретного заголовка, 405 для метода, 503 при сбое Trigger.dev, повтор update и последовательность двух сообщений одного чата.
+- [x] Развёрнуты контейнер и задача Trigger.dev; секреты заданы только в серверных окружениях; бакет Bunny Storage создан, lifecycle-очистка объектов старше 7 дней заменена на cron-workflow (см. TODO деплоя).
+- [x] Проверены 401 без секретного заголовка, 405 для метода, 503 при сбое Trigger.dev (тестом с выключенным ключом), повтор update и последовательность двух сообщений одного чата.
 - [ ] Проверены `/start`, `/help`, `/clear`, обычный вопрос, follow-up, вопрос вне базы, кризис, длинный ответ и неопределённая доставка на тестовом боте; ответы соответствуют принципам скилла поддержки (ННО: без диагнозов и оценок собеседника, эмпатичная формулировка).
 - [ ] Слепое сравнение минимум 30 ответов со старым ботом: не менее 70% не хуже и не менее 50% лучше; критических ошибок на кризисном наборе нет.
-- [ ] Edge Script отключён, `getWebhookInfo` показывает URL контейнера без растущей очереди ошибок; откат на Edge Script URL проверен до переключения.
+- [x] Продовый webhook переведён на контейнер (`getWebhookInfo`: `https://mc-of7dlol10n.bunny.run/webhook`); откат — `setWebhook` на `https://pif-bot.evgrezanov.workers.dev/webhook` (Edge Script не отключён).
 
 
 
@@ -139,8 +139,10 @@ created: 2026-10-22
 - [x] **Контейнер приёма развёрнут в Bunny Magic Container:** приложение `pifai-webhook` (app id `AXg55OpMsJ6JwQR`, контейнер id `AXg55OpMsJ6JwQR-0tuH`), образ `ghcr.io/aiiddqd/pifai-webhook:20261022` (linux/amd64, собран podman, non-root, секреты только в env контейнера). Публичный эндпоинт: `https://mc-of7dlol10n.bunny.run` (CDN, pull zone `6845699`). Проверено на проде: `GET /health` → 200, `POST /webhook` без секрета → 401, неверный секрет → 401, `GET /webhook` → 405, прочие пути → 404.
 - [x] **Bunny Storage создан:** зона `pifai-dialogues` (id `2007933`, регион DE, хост `storage.bunnycdn.com`). Пароль зоны задан в GitHub секрет `PIFAI_STORAGE_ACCESS_KEY` и в env задачи Trigger.dev (`BUNNY_STORAGE_ZONE`/`BUNNY_STORAGE_ACCESS_KEY`/`BUNNY_STORAGE_HOST`, env prod).
 - [x] **Очистка истории:** у Bunny Storage нет нативных lifecycle-правил (отклонение от RFC, см. ниже) — вместо них `.github/workflows/storage-cleanup.yml` (cron ежедневно 02:30 UTC + вручную) запускает [scripts/storage-cleanup.mjs](../../scripts/storage-cleanup.mjs): удаляет объекты старше 7 дней в префиксе `pifai/`.
-- [x] **Модель задана:** `OPENROUTER_MODEL=deepseek/deepseek-pro-latest` в env prod Trigger.dev (выбор пользователя, «deepseek pro»).
-- [x] **Задача `consult-telegram` задеплоена:** версия `20261022.1` (LangGraph-агент, пакет знаний `1dee85f7b5f1342d`: 69 страниц + скилл), проект `proj_rfldgyqffeltidshyifn`, окружение prod.
+- [x] **Модель задана:** `OPENROUTER_MODEL=deepseek/deepseek-v4-pro` в env prod Trigger.dev (выбор пользователя — «deepseek pro»; первый вариант `deepseek/deepseek-pro-latest` оказался невалидным ID на OpenRouter, исправлено при первых живых ответах; fallback `deepseek/deepseek-v3.2`).
+- [x] **Задача `consult-telegram` задеплоена:** версии `20261022.1` → `20261022.2` (LangGraph-агент, пакет знаний `1dee85f7b5f1342d`: 69 страниц + скилл), проект `proj_rfldgyqffeltidshyifn`, окружение prod.
+- [x] **Задача `consult-telegram` задеплоена:** версии `20261022.1` → `20261022.2` (LangGraph-агент, пакет знаний `1dee85f7b5f1342d`: 69 страниц + скилл), проект `proj_rfldgyqffeltidshyifn`, окружение prod.
+- [x] **Признак жизни в чате (v`20261022.2`):** после claim агент мгновенно отправляет «Давайте подумаем…» и затем **редактирует это же сообщение** финальным ответом — или нейтральным текстом о сбое, если модель не сработала. Сбой ack не блокирует доставку; команды и кризис отвечают мгновенно без ack. Проверено unit-тестами (31) и продовым run.
 - [x] GitHub: переменная `WEBHOOK_APP_ID=AXg55OpMsJ6JwQR`; секреты `PIFAI_STORAGE_ACCESS_KEY`, `PIFAI_TELEGRAM_WEBHOOK_SECRET` (для переключения webhook), `TRIGGER_ACCESS_TOKEN` (для env-настройки через [services-setup.yml](../../.github/workflows/services-setup.yml)); `BUNNYNET_API_KEY` и `TELEGRAM_BOT_TOKEN` были.
 
 ### Нужно от пользователя

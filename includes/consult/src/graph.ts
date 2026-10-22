@@ -27,6 +27,7 @@ export interface Dependencies {
 export const greetingResponse = 'Привет! Я ПиФ, ИИ-помощник по психологии и философии. Могу выслушать и предложить материалы из базы знаний. Расскажи, что тебя волнует? Я не заменяю психолога или врача.';
 export const helpResponse = 'Напиши вопрос или расскажи о ситуации. /start — начать заново, /help — справка, /clear — удалить историю этого чата. Я ИИ-помощник и не заменяю специалиста.';
 export const clearResponse = 'История этого чата очищена. Можем начать заново.';
+export const ackMessage = 'Давайте подумаем…';
 
 export function commandOf(text: string): Command | undefined {
   return text.match(/^\/(start|help|clear)(?:@\w+)?(?:\s|$)/i)?.[1]?.toLowerCase() as Command | undefined;
@@ -39,6 +40,7 @@ const State = Annotation.Root({
   command: Annotation<Command | null>({ reducer: (_, b) => b, default: () => null }),
   response: Annotation<string>({ reducer: (_, b) => b, default: () => '' }),
   messages: Annotation<BaseMessage[]>({ reducer: (a, b) => a.concat(b), default: () => [] }),
+  ackMessageId: Annotation<number | null>({ reducer: (_, b) => b, default: () => null }),
   claimed: Annotation<boolean>({ reducer: (_, b) => b, default: () => false }),
   outcome: Annotation<Outcome | ''>({ reducer: (_, b) => b, default: () => '' }),
 });
@@ -94,6 +96,18 @@ export function buildConsultGraph(deps: Dependencies) {
   // Crisis signals are checked before search and the LLM; the answer carries no
   // geographically specific number until contacts are approved by hand.
   const answerCrisis = async (): Promise<Partial<State>> => ({ response: crisisResponse });
+
+  // Life-sign: a short comment right after the update is claimed, replaced by
+  // the answer (or the failure message) once the graph has it.
+  const sendAck = async (state: State): Promise<Partial<State>> => {
+    try {
+      const messageId = await deps.telegram.ack(state.job!.chatId, ackMessage);
+      return { ackMessageId: messageId };
+    } catch (error) {
+      deps.log?.({ event: 'ack_failed', message: String(error) });
+      return { ackMessageId: null };
+    }
+  };
 
   const agent = async (state: State): Promise<Partial<State>> => {
     const version = wikiVersion();
@@ -172,7 +186,7 @@ export function buildConsultGraph(deps: Dependencies) {
 
   const send = async (state: State): Promise<Partial<State>> => {
     try {
-      await deps.telegram.send(state.job!.chatId, state.response);
+      await deps.telegram.send(state.job!.chatId, state.response, state.ackMessageId ?? undefined);
       return { outcome: 'delivered' };
     } catch {
       // The request may have reached Telegram. Replaying it could send a second message.
@@ -193,11 +207,12 @@ export function buildConsultGraph(deps: Dependencies) {
     .addNode('plan_route', route)
     .addNode('answer_command', answerCommand)
     .addNode('answer_crisis', answerCrisis)
+    .addNode('claim_delivery', claimDelivery)
+    .addNode('ack', sendAck)
     .addNode('agent', agent)
     .addNode('wiki_tools', executeWikiTools)
     .addNode('assemble', assemble)
     .addNode('save_history', saveHistory)
-    .addNode('claim_delivery', claimDelivery)
     .addNode('send', send)
     .addEdge(START, 'validate')
     .addConditionalEdges('validate', (state) => state.outcome === 'invalid' ? END : 'load_history', [END, 'load_history'])
@@ -205,15 +220,20 @@ export function buildConsultGraph(deps: Dependencies) {
     .addConditionalEdges('plan_route', (state) => state.route, {
       command: 'answer_command',
       crisis: 'answer_crisis',
-      consult: 'agent',
+      consult: 'claim_delivery',
     })
+    .addEdge('answer_command', 'claim_delivery')
+    .addEdge('answer_crisis', 'claim_delivery')
+    .addConditionalEdges('claim_delivery', (state) => {
+      if (!state.claimed) return END;
+      // Only consultations get the thinking comment; commands and crisis answers are instant.
+      return state.route === 'consult' ? 'ack' : 'send';
+    }, [END, 'ack', 'send'])
+    .addEdge('ack', 'agent')
     .addConditionalEdges('agent', (state) => hasPendingToolCalls(state) ? 'wiki_tools' : 'assemble', ['wiki_tools', 'assemble'])
     .addEdge('wiki_tools', 'agent')
-    .addEdge('answer_command', 'save_history')
-    .addEdge('answer_crisis', 'save_history')
     .addEdge('assemble', 'save_history')
-    .addEdge('save_history', 'claim_delivery')
-    .addConditionalEdges('claim_delivery', (state) => state.claimed ? 'send' : END, ['send', END])
+    .addEdge('save_history', 'send')
     .addEdge('send', END)
     .compile();
 }
